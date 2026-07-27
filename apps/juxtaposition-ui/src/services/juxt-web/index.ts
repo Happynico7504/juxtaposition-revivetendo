@@ -36,6 +36,7 @@ consoleRouter.use('/users', routes.PORTAL_USER);
 consoleRouter.use('/posts', routes.PORTAL_POST);
 consoleRouter.use('/feed', routes.PORTAL_FEED);
 consoleRouter.use('/news', routes.PORTAL_NEWS);
+consoleRouter.use('/web-account', routes.WEB_ACCOUNT);
 
 // Setup routes for web
 webRouter.use(webAuth);

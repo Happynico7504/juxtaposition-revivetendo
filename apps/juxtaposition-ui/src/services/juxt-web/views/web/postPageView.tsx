@@ -4,10 +4,8 @@ import { WebReportModalView } from '@/services/juxt-web/views/web/reportModalVie
 import { WebPostView } from '@/services/juxt-web/views/web/post';
 import { useUrl } from '@/services/juxt-web/views/common/hooks/useUrl';
 import { T } from '@/services/juxt-web/views/common/components/T';
-import { useUser } from '@/services/juxt-web/views/common/hooks/useUser';
-import { WebUIIcon } from '@/services/juxt-web/views/web/components/ui/WebUIIcon';
 import type { ReactNode } from 'react';
-import type { GetUserDataResponse } from '@pretendonetwork/grpc/account/v2/get_user_data_rpc';
+import type { GetUserDataResponse } from '@pretendonetwork/grpc/account/get_user_data_rpc';
 import type { Community, Post, SelfContent } from '@/api/generated';
 
 export type PostPageViewProps = {
@@ -17,28 +15,27 @@ export type PostPageViewProps = {
 	community: Community;
 	replies: Post[];
 	canPost: boolean;
-	sort: 'newest-first' | 'oldest-first';
 };
 
 function PostHead(props: PostPageViewProps): ReactNode {
 	const url = useUrl();
 	const post = props.post;
-	const pageTitle = T.str('post.title', { username: post.author.miiName });
+	const pageTitle = T.str('post.title', { username: post.screen_name });
 
-	if (post.moderation?.removed) {
+	if (post.removed) {
 		return (
 			<title>{pageTitle}</title>
 		);
 	}
 
-	const title = `${post.author.miiName} (@${props.postPNID.username}) - ${props.community.name}`;
+	const title = `${post.screen_name} (@${props.postPNID.username}) - ${props.community.name}`;
 	const description = post.body + '\n\n' +
-		`${post.stats.replyCount} 🗨️  ${post.stats.empathyCount} ❤️`;
+		`${post.reply_count} 🗨️  ${post.empathy_count} ❤️`;
 	let image: string | null = null;
 	if (post.screenshot) {
-		image = url.cdn(post.screenshot.imageUrl);
+		image = url.cdn(post.screenshot);
 	} else if (post.painting) {
-		image = url.cdn(`/paintings/${post.author.pid}/${post.id}.png`);
+		image = url.cdn(`/paintings/${post.pid}/${post.id}.png`);
 	}
 
 	return (
@@ -70,8 +67,6 @@ function PostHead(props: PostPageViewProps): ReactNode {
 }
 
 export function WebPostPageView(props: PostPageViewProps): ReactNode {
-	const user = useUser();
-
 	return (
 		<WebRoot head={<PostHead {...props} />}>
 			<h2 id="title" className="page-header"><T k="post.heading" /></h2>
@@ -80,30 +75,6 @@ export function WebPostPageView(props: PostPageViewProps): ReactNode {
 			<div className="community-page-post-box" id="post">
 				<WebWrapper>
 					<WebPostView post={props.post} userContent={props.userContent} isMainPost />
-					<div className="reply-control-bar">
-						<p className="reply-control-title"><T k="post.replies_heading" /></p>
-						{user.perms.moderator
-							? (
-									<a className="reply-control-item" href={`/posts/${props.post.id}/create`}>
-										<span className="reply-icon small"><WebUIIcon name="reply" /></span>
-										<T k="post.reply_post" />
-									</a>
-								)
-							: null }
-						{props.sort === 'newest-first'
-							? (
-									<a className="reply-control-item" href={`/posts/${props.post.id}?sort=oldest-first`}>
-										<span className="reply-icon"><WebUIIcon name="up-down" /></span>
-										<T k="post.sort_newest_first" />
-									</a>
-								)
-							: (
-									<a className="reply-control-item" href={`/posts/${props.post.id}?sort=newest-first`}>
-										<span className="reply-icon"><WebUIIcon name="up-down" /></span>
-										<T k="post.sort_oldest_first" />
-									</a>
-								)}
-					</div>
 					<span className="replies-line" />
 					{props.replies.map(replyPost => (
 						<div key={replyPost.id}>

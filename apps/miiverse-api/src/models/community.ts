@@ -94,7 +94,7 @@ const CommunitySchema = new Schema<ICommunity, CommunityModel, ICommunityMethods
 	owner: Number,
 	created_at: {
 		type: Date,
-		default: (): Date => new Date()
+		default: new Date()
 	},
 	empathy_count: {
 		type: Number,

@@ -34,8 +34,7 @@ const errorCodes = {
 	auth_onboarding_incomplete: 403,
 	user_deleted: 404,
 	user_banned: 404,
-	automod_prevented: 400,
-	invalid_post: 400
+	automod_prevented: 403
 } as const;
 const errorCodeKeys = Object.keys(errorCodes) as [keyof typeof errorCodes, ...Array<keyof typeof errorCodes>];
 

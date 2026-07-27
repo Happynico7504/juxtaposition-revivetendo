@@ -54,8 +54,8 @@ export function PortalNavBar(props: NavBarProps): ReactNode {
 				data-navbar-tab="friends"
 				className={selectedClasses(3)}
 			>
-				<a href="/news/friend_requests" data-pjax="#body" data-sound="SE_WAVE_MENU">
-					<T k="global.friend_requests" />
+				<a href="/friend-requests" data-pjax="#body" data-sound="SE_WAVE_MENU">
+					Friend Requests
 				</a>
 			</li>
 			<li

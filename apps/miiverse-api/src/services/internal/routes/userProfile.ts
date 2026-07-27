@@ -238,10 +238,10 @@ userProfileRouter.post({
 		}),
 		response: followSchema
 	},
-	async handler({ params, db, auth }) {
+	async handler({ params, auth }) {
 		const targetUserPid = params.id;
-		const targetUser = await Settings.findOne({ pid: targetUserPid });
-		const targetUserContent = await Content.findOne({ pid: targetUserPid });
+		const targetUser = await Settings.findOne({ targetUserPid });
+		const targetUserContent = await Content.findOne({ targetUserPid });
 		if (!targetUser || !targetUserContent) {
 			throw errors.for('not_found');
 		}
@@ -265,7 +265,7 @@ userProfileRouter.post({
 		await targetUserContent.save();
 		await currentUser.content.save();
 
-		await createNewFollowNotification(db, { currentUser: currentUserPid, userToFollow: targetUserPid });
+		await createNewFollowNotification({ currentUser: currentUserPid, userToFollow: targetUserPid });
 		return mapFollowUser('follow', targetUserContent);
 	}
 });
@@ -282,8 +282,8 @@ userProfileRouter.delete({
 	},
 	async handler({ params, auth }) {
 		const targetUserPid = params.id;
-		const targetUser = await Settings.findOne({ pid: targetUserPid });
-		const targetUserContent = await Content.findOne({ pid: targetUserPid });
+		const targetUser = await Settings.findOne({ targetUserPid });
+		const targetUserContent = await Content.findOne({ targetUserPid });
 		if (!targetUser || !targetUserContent) {
 			throw errors.for('not_found');
 		}

@@ -6,7 +6,7 @@ import { initPostPageView } from './post';
 import { initNavTabs } from './components/ui/PortalNavTabs';
 import { initSearchForm } from './components/ui/PortalSearchForm';
 import { initNavBar } from './components/PortalNavBar';
-import { back, exit } from './nav';
+import { back } from './nav';
 
 export var pjax;
 setInterval(checkForUpdates, 30000);
@@ -329,7 +329,17 @@ window.stopLoading = stopLoading;
 
 function reportPost(post) {
 	var id = post.getAttribute('data-post');
-	pjax.loadUrl('/posts/' + id + '/report');
+	var button = document.getElementById('report-launcher');
+	var form = document.getElementById('report-form');
+	var formID = document.getElementById('report-post-id');
+	if (!id || !button || !form || !formID) {
+		return;
+	}
+
+	form.action = '/posts/' + id + '/report';
+	formID.value = id;
+	console.log(id.replace(/(\d{3})(\d{4})(\d{3})(\d{4})(\d{3})(\d{4})/, '$1-$2-$3-$4-$5-$6'));
+	button.click();
 }
 window.reportPost = reportPost;
 
@@ -367,8 +377,3 @@ function input() {
 			back();
 	}
 }
-
-function exitApplet() {
-	exit();
-}
-window.exitApplet = exitApplet;

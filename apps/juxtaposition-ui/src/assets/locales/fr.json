@@ -67,7 +67,7 @@
         "profile_settings": "Paramètres du profil",
         "show_country": "Afficher mon pays sur le profil",
         "show_birthday": "Afficher mon anniversaire sur le profil",
-        "show_game": "Afficher mon expérience de jeu sur le profil",
+        "show_game": "Afficher mon expérience de joueur sur le profil",
         "save_action": "Enregistrer les paramètres",
         "gdpr_download": "Télécharger les données utilisateur",
         "gdpr_download_action": "Télécharger",
@@ -78,12 +78,10 @@
     },
     "notifications": {
         "none": "Aucune notification.",
-        "new_follower": {
-            "message/one": "<follower_one /> vous suit !",
-            "message/two": "<follower_one /> et <follower_two /> vous suivent !",
-            "message/three": "<follower_one />, <follower_two /> et {{count_other}} autre personne vous suivent !",
-            "message/multiple": "<follower_one />, <follower_two /> et {{count_other}} autres personnes vous suivent !"
-        }
+        "new_follower/one": "<follower_one /> vous suit !",
+        "new_follower/two": "<follower_one /> et <follower_two /> vous suivent !",
+        "new_follower/three": "<follower_one />, <follower_two /> et {{count_other}} autre personne vous suivent !",
+        "new_follower/multiple": "<follower_one />, <follower_two /> et {{count_other}} autres personnes vous suivent !"
     },
     "new_post": {
         "post_to": "Envoyer à {{user}}",
@@ -124,7 +122,7 @@
             "twelfth": "Avez-vous joué à ce jeu ?",
             "thirteenth": "Si vous postez dans la communauté pour un jeu auquel vous avez joué, vos messages auront une icône indiquant que vous y avez joué."
         },
-        "experience": "Expérience de jeu",
+        "experience": "Expérience de joueur",
         "experience_text": {
             "info": "Comment décririez-vous votre niveau de compétence avec les jeux ? Vous pourrez changer ce paramètre plus tard.",
             "beginner": "Débutant",

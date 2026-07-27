@@ -4,6 +4,7 @@ import { postsRouter } from '@/services/juxt-web/routes/console/posts';
 import { userPageRouter } from '@/services/juxt-web/routes/console/userpage';
 import { feedRouter } from '@/services/juxt-web/routes/console/feed';
 import { notificationRouter } from '@/services/juxt-web/routes/console/notifications';
+import { webAccountRouter } from '@/services/juxt-web/routes/console/webAccount';
 import { topicsRouter } from '@/services/juxt-web/routes/console/topics';
 import { loginRouter } from '@/services/juxt-web/routes/web/login';
 import { staticRouter } from '@/services/juxt-web/routes/console/static';
@@ -17,6 +18,7 @@ export const routes = {
 	PORTAL_POST: postsRouter,
 	PORTAL_FEED: feedRouter,
 	PORTAL_NEWS: notificationRouter,
+	WEB_ACCOUNT: webAccountRouter,
 	PORTAL_TOPICS: topicsRouter,
 	WEB_LOGIN: loginRouter,
 	ADMIN: baseAdminRouter,

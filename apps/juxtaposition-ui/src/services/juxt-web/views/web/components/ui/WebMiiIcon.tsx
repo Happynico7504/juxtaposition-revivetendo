@@ -13,7 +13,8 @@ export type MiiIconProps = {
 
 export function WebMiiIcon(props: MiiIconProps): ReactNode {
 	const url = useUrl();
-	const miiUrl = props.face_url ?? url.cdn(`/mii/${props.pid}/normal_face.png`);
+	const miiPath = props.face_url ? new URL(props.face_url).pathname : `/mii/${props.pid}/normal_face.png`;
+	const miiUrl = url.cdn(miiPath);
 	const href = props.link !== false ? `/users/${props.pid}` : undefined;
 	const type = props.type ?? 'mii-icon';
 

@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { uploadPainting, uploadScreenshot } from '@/images';
-import { getShotModeForTitleId } from '@/services/api/routes/posts';
 import { evaluateAutomodRules, getInvalidPostRegex, performAutomodAction } from '@/util';
 import { config } from '@/config';
 import { getDuplicatePosts } from '@/database';
@@ -88,8 +87,10 @@ export async function createNewPost(ops: PostCreateOptions): Promise<HydratedPos
 
 	let screenshots = null;
 	if (body.screenshot) {
-		const shotMode = getShotModeForTitleId(ops.community, body.screenshot.titleId);
-		if (shotMode !== 'block') {
+		const titleId = body.screenshot.titleId;
+		const shotAllowed = ops.community.title_id.includes(titleId) ||
+			Boolean(ops.community.shot_extra_title_id?.includes(titleId));
+		if (shotAllowed && ops.community.shot_mode !== 'block') {
 			screenshots = await uploadScreenshot({
 				blob: body.screenshot.file,
 				pid: ops.author.pid,

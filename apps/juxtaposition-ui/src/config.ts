@@ -30,6 +30,8 @@ const schema = z.object({
 	postLimit: z.coerce.number().default(10),
 	/** CDN path hosting Mii images, icons, etc. ${cdnDomain}/mii/100000000/normal_face.png */
 	cdnDomain: z.string(),
+	/** Console-specific CDN override (Wii U/3DS). Falls back to cdnDomain if unset. */
+	cdnDomainConsole: z.string().optional(),
 	/** Value for X-Nintedo-Whitelist header. */
 	whitelist: z.string(),
 	/** Environment (prod/test/dev) to use for Discovery and access_level control. */
@@ -38,7 +40,22 @@ const schema = z.object({
 	disableConsoleChecks: z.stringbool().default(false),
 	/** AES key for encrypting session */
 	aesKey: z.string(),
+	mongoose: z.object({
+		uri: z.string()
+	}),
+	s3: z.object({
+		endpoint: z.string(),
+		key: z.string(),
+		secret: z.string(),
+		bucket: z.string(),
+		region: z.string()
+	}),
 	grpc: z.object({
+		friends: z.object({
+			host: z.string(),
+			port: z.string(),
+			apiKey: z.string()
+		}),
 		account: z.object({
 			host: z.string(),
 			port: z.string(),
@@ -76,7 +93,22 @@ export const presets = {
 		serverEnvironment: 'prod',
 		disableConsoleChecks: true,
 		aesKey: '1234567812345678123456781234567812345678123456781234567812345678',
+		mongoose: {
+			uri: 'mongodb://localhost:27017/miiverse?directConnection=true'
+		},
+		s3: {
+			endpoint: 'http://localhost:9000',
+			key: 'minioadmin',
+			secret: 'minioadmin',
+			bucket: 'miiverse',
+			region: 'us-east-1'
+		},
 		grpc: {
+			friends: {
+				host: 'localhost',
+				port: 8124,
+				apiKey: '12345678123456781234567812345678'
+			},
 			account: {
 				host: 'localhost',
 				port: 8123,

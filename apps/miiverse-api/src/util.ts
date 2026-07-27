@@ -1,9 +1,9 @@
-import { randomUUID } from 'node:crypto';
+import crypto from 'node:crypto';
 import { DeleteObjectsCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { SystemType } from '@pretendonetwork/grpc/account/v2/token_info';
 import { config } from '@/config';
 import { logger } from '@/logger';
-import { grpcAccount, grpcApi, oldGrpcFriends } from '@/grpc';
+import { grpcAccount, grpcApi, grpcFriends } from '@/grpc';
 import { getS3 } from '@/s3';
 import { AutomodLog } from '@/models/automodLog';
 import type { IncomingHttpHeaders } from 'node:http';
@@ -133,7 +133,7 @@ export async function bulkDeleteCDNAsset(keys: string[]): Promise<boolean> {
 }
 
 export async function getUserFriendPIDs(pid: number): Promise<number[]> {
-	const response = await oldGrpcFriends.client().getUserFriendPIDs({
+	const response = await grpcFriends.client().getUserFriendPIDs({
 		pid: pid
 	});
 
@@ -141,7 +141,7 @@ export async function getUserFriendPIDs(pid: number): Promise<number[]> {
 }
 
 export async function getUserFriendRequestsIncoming(pid: number): Promise<FriendRequest[]> {
-	const response = await oldGrpcFriends.client().getUserFriendRequestsIncoming({
+	const response = await grpcFriends.client().getUserFriendRequestsIncoming({
 		pid: pid
 	});
 
@@ -267,8 +267,4 @@ export async function performAutomodAction(post: IPostInput, evaluation: Automod
 	}
 
 	throw new Error('Invalid automod evaluation');
-}
-
-export function genId(): string {
-	return randomUUID();
 }

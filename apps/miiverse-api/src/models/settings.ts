@@ -64,11 +64,11 @@ const SettingsSchema = new Schema<ISettings, SettingsModel, ISettingsMethods>({
 	},
 	created_at: {
 		type: Date,
-		default: (): Date => new Date()
+		default: Date.now()
 	},
 	last_active: {
 		type: Date,
-		default: (): Date => new Date(),
+		default: Date.now(),
 		index: true
 	}
 });

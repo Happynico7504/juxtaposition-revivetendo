@@ -124,19 +124,6 @@ PostSchema.index({
 	removed: 1
 });
 
-// Index for post count on community page
-PostSchema.index({
-	community_id: 1,
-	removed: 1,
-	parent: 1
-});
-
-// Index for post metrics
-PostSchema.index({
-	message_to_pid: 1,
-	created_at: 1
-});
-
 // posts.list
 PostSchema.index({
 	pid: 1,
@@ -167,11 +154,14 @@ PostSchema.index({
 });
 
 PostSchema.method<HydratedPostDocument>('del', async function del(reason: string, pid: number) {
-	this.removed = true;
-	this.removed_by = pid;
-	this.removed_reason = reason;
-	this.removed_at = new Date();
-	await this.save();
+	await this.updateOne({
+		$set: {
+			removed: true,
+			removed_by: pid,
+			removed_reason: reason,
+			removed_at: new Date()
+		}
+	});
 });
 
 PostSchema.method<HydratedPostDocument>('generatePostUID', async function generatePostUID(length: number) {
