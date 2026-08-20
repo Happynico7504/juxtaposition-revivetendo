@@ -49,8 +49,8 @@ router.get('/', async function (request: express.Request, response: express.Resp
 	if (!WARA_WARA_PLAZA_CACHE.valid()) {
 		const communities = await calculateMostPopularCommunities(24, 10);
 
-		if (communities.length < 10) {
-			request.log.warn('Not enough communities exist for topics request');
+		if (communities.length === 0) {
+			request.log.warn('No communities exist for topics request');
 			return badRequest(response, ApiErrorCode.NOT_FOUND_COMMUNITY, 404);
 		}
 
@@ -237,11 +237,15 @@ async function calculateMostPopularCommunities(hours: number, limit: number): Pr
 		}
 	]);
 
-	const communityIDs = validCommunities[0].communities;
+	const communityIDs = validCommunities[0]?.communities;
 
-	if (!communityIDs) {
+	if (!communityIDs || communityIDs.length === 0) {
 		throw new Error('No communities found');
 	}
+
+	// * Can never find more popular communities than exist in total, so don't
+	// * chase a target the community count structurally can't reach.
+	const effectiveLimit = Math.min(limit, communityIDs.length);
 
 	const popularCommunities = await Post.aggregate<{ _id: null; count: number }>([
 		{
@@ -264,7 +268,7 @@ async function calculateMostPopularCommunities(hours: number, limit: number): Pr
 			}
 		},
 		{
-			$limit: limit
+			$limit: effectiveLimit
 		},
 		{
 			$sort: {
@@ -273,7 +277,11 @@ async function calculateMostPopularCommunities(hours: number, limit: number): Pr
 		}
 	]);
 
-	if (popularCommunities.length < limit) {
+	// * Keep expanding the search window until we hit the target, but stop once
+	// * we've gone back far enough that expanding further can't find anything new
+	// * (otherwise this recurses forever when fewer than `effectiveLimit`
+	// * communities have ever had any posts at all).
+	if (popularCommunities.length < effectiveLimit && last24Hours.getFullYear() >= 2020) {
 		return calculateMostPopularCommunities(hours + hours, limit);
 	}
 
