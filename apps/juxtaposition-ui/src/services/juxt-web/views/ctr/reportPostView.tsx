@@ -13,7 +13,7 @@ export function CtrReportPostView(props: ReportPostViewProps): ReactNode {
 			>
 				<T k="reporting.title" />
 			</CtrPageTitledHeader>
-			<form method="post" action={`/posts/${props.id}/report`} className="report-form post" name="report">
+			<form method="post" action={props.action ?? `/posts/${props.id}/report`} className="report-form post" name="report">
 				<input type="hidden" name="post_id" id="report-post-id" value={props.id} />
 				<p><T k="reporting.description" /></p>
 				<div className="dropdown">

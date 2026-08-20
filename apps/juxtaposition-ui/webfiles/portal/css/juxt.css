@@ -256,6 +256,41 @@ body {
 #header #header-communities-button.delete {
  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='url(%23grad1)' viewBox='0 0 256 256' width='50' height='50'%3E%3ClinearGradient xmlns='http://www.w3.org/2000/svg' id='grad1' x1='0%25' y1='0%25' x2='0%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23495167;stop-opacity:1'/%3E%3Cstop offset='100%25' style='stop-color:%23676E87;stop-opacity:1'/%3E%3C/linearGradient%3E%3Cpath d='M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z' stroke='url(%23grad1)' stroke-width='3'/%3E%3C/svg%3E")no-repeat 23px 8px,-webkit-gradient(linear,left top,left bottom,from(#fff),color-stop(.5,#fff),to(#e6e6e6))0 0;
 }
+/* Header button group: lets a settings-style button (#header-communities-button,
+   position:absolute/right:0 above) sit next to sibling buttons instead of pinned solo
+   to the corner. The override below only fires inside .header-button-group, so pages
+   that still use #header-communities-button alone are unaffected. Uses inline-block,
+   not flexbox: the Wii U console browser (this stylesheet still targets -webkit-gradient,
+   pre-standard syntax) doesn't support display:flex, which silently falls back to the
+   buttons' own display:block and stacks them vertically instead of side by side. */
+#header .header-button-group {
+ position:absolute;
+ top:0;
+ right:0;
+ z-index:20;
+ white-space:nowrap
+}
+#header .header-button-group #header-communities-button {
+ position:static;
+ float:none;
+ right:auto;
+ top:auto;
+ display:inline-block;
+ vertical-align:top
+}
+#header .header-button-group #header-messages-button {
+ display:inline-block;
+ vertical-align:top;
+ height:65px;
+ line-height:65px;
+ padding:0 25px 0 85px;
+ border:0;
+ margin:0;
+ font-size:25px;
+ color:#323232;
+ border-radius:0 0 0 20px;
+ background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 256 256'%3E%3ClinearGradient id='grad1' x1='0%25' y1='0%25' x2='0%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23495167;stop-opacity:1'%3E%3C/stop%3E%3Cstop offset='100%25' style='stop-color:%23676E87;stop-opacity:1'%3E%3C/stop%3E%3C/linearGradient%3E%3Cpath d='M32,56 H224 a16,16 0 0 1 16,16 V176 a16,16 0 0 1 -16,16 H96 L56,232 V192 H32 a16,16 0 0 1 -16,-16 V72 a16,16 0 0 1 16,-16 Z' fill='none' stroke='url(%23grad1)' stroke-linecap='round' stroke-linejoin='round' stroke-width='16'%3E%3C/path%3E%3C/svg%3E")no-repeat 23px 8px,-webkit-gradient(linear,left top,left bottom,from(#fff),color-stop(.5,#fff),to(#e6e6e6))0 0
+}
 #header #page-title {
  padding-left:25px;
  overflow:hidden;

@@ -53,8 +53,10 @@ async function commonGetSubCommunity(paramPack: ParamPack, communityID: string |
 router.get('/', async function (request: express.Request, response: express.Response): Promise<void> {
 	response.type('application/xml');
 
+	request.log.info(`GET /communities title_id=${request.paramPack.title_id}`);
 	const parentCommunity = await getCommunityByTitleID(request.paramPack.title_id);
 	if (!parentCommunity) {
+		request.log.warn(`No community for title_id=${request.paramPack.title_id}`);
 		return badRequest(response, ApiErrorCode.NOT_FOUND_COMMUNITY, 404);
 	}
 

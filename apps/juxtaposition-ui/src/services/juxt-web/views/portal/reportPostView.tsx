@@ -10,7 +10,7 @@ export function PortalReportPostView(props: ReportPostViewProps): ReactNode {
 			<header className="add-post-page-header">
 				<h1 className="page-title"><T k="reporting.title" /></h1>
 			</header>
-			<form method="post" action={`/posts/${props.id}/report`} id="report-form" name="report" data-is-own-title="1" data-is-identified="1">
+			<form method="post" action={props.action ?? `/posts/${props.id}/report`} id="report-form" name="report" data-is-own-title="1" data-is-identified="1">
 				<input type="hidden" name="post_id" id="report-post-id" value={props.id} />
 				<div className="add-post-page-content report">
 					<p><T k="reporting.description" /></p>

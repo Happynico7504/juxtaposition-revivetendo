@@ -82,6 +82,28 @@ export function CtrUserPageView(props: UserPageViewProps): ReactNode {
 							)
 						: null}
 
+					{isSelf
+						? (
+								<CtrPageButton
+									type="right"
+									href="/friend_messages"
+								>
+									<T k="global.messages" />
+								</CtrPageButton>
+							)
+						: null}
+
+					{!isSelf
+						? (
+								<CtrPageButton
+									type="right"
+									href={`/friend_messages/new/${profile.pid}`}
+								>
+									<T k="global.messages" />
+								</CtrPageButton>
+							)
+						: null}
+
 					{!isSelf
 						? (
 								<CtrPageButton

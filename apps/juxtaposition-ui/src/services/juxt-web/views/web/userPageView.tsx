@@ -242,6 +242,17 @@ export function WebUserPageView(props: UserPageViewProps): ReactNode {
 				<WebInfoboxButtons>
 					{isSelf
 						? (
+								<WebInfoboxButton href="/friend_messages">
+									<T k="global.messages" />
+								</WebInfoboxButton>
+							)
+						: (
+								<WebInfoboxButton href={`/friend_messages/new/${profile.pid}`}>
+									<T k="global.messages" />
+								</WebInfoboxButton>
+							)}
+					{isSelf
+						? (
 								<WebInfoboxButton href="/users/downloadUserData.json">
 									<T k="user_settings.gdpr_download" />
 								</WebInfoboxButton>

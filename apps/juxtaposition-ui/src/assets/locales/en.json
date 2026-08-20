@@ -22,7 +22,8 @@
     "save": "Save",
     "exit": "Exit",
     "next": "Next",
-    "search": "Search..."
+    "search": "Search...",
+    "messages": "Messages"
   },
   "login": {
     "title": "Juxtaposition Log In",
@@ -60,6 +61,9 @@
     "related_short": "Related",
     "related_to": "{{community}} Related Communities",
     "closed": "This community is closed to new posts."
+  },
+  "messages": {
+    "coming_soon": "No messages yet. Start a conversation from a friend's profile!"
   },
   "user_page": {
     "country": "Country",

@@ -35,8 +35,10 @@ consoleRouter.use('/topics', routes.PORTAL_TOPICS);
 consoleRouter.use('/users', routes.PORTAL_USER);
 consoleRouter.use('/posts', routes.PORTAL_POST);
 consoleRouter.use('/feed', routes.PORTAL_FEED);
+consoleRouter.use('/friend_messages', routes.PORTAL_MESSAGES);
 consoleRouter.use('/news', routes.PORTAL_NEWS);
 consoleRouter.use('/web-account', routes.WEB_ACCOUNT);
+consoleRouter.use('/wsc-players', routes.WSC_PLAYERS);
 
 // Setup routes for web
 webRouter.use(webAuth);
@@ -49,6 +51,8 @@ webRouter.use('/topics', routes.PORTAL_TOPICS);
 webRouter.use('/users', routes.PORTAL_USER);
 webRouter.use('/posts', routes.PORTAL_POST);
 webRouter.use('/feed', routes.PORTAL_FEED);
+webRouter.use('/friend_messages', routes.PORTAL_MESSAGES);
 webRouter.use('/news', routes.PORTAL_NEWS);
 webRouter.use('/login', routes.WEB_LOGIN);
 webRouter.use('/admin', routes.ADMIN);
+webRouter.use('/wsc-players', routes.WSC_PLAYERS);

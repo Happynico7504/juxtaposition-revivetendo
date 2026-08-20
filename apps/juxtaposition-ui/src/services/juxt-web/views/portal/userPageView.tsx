@@ -112,7 +112,18 @@ export function PortalUserPageView(props: UserPageViewProps): ReactNode {
 			<PortalNavBar selection={-1} />
 			<PortalPageBody>
 				<header id="header">
-					{isSelf ? <a id="header-communities-button" className="user-page" href="/users/me/settings" data-pjax="#body">Settings</a> : null}
+					{isSelf
+						? (
+								<div className="header-button-group">
+									<a id="header-messages-button" href="/friend_messages" data-pjax="#body">Messages</a>
+									<a id="header-communities-button" className="user-page" href="/users/me/settings" data-pjax="#body">Settings</a>
+								</div>
+							)
+						: (
+								<div className="header-button-group">
+									<a id="header-messages-button" href={`/friend_messages/new/${profile.pid}`} data-pjax="#body">Message</a>
+								</div>
+							)}
 				</header>
 
 				<div className="body-content tab2-content" id="community-post-list">

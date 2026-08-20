@@ -64,9 +64,10 @@ function initPopupMenus() {
 		setupPopup(button);
 
 		const post = menu.getAttribute('data-post');
+		const reportBase = menu.getAttribute('data-report-base');
 
 		popupItemCb(menu.querySelector('[data-action="report"]'), (_item, _ev) => {
-			reportPost(post);
+			reportPost(post, reportBase);
 		});
 		popupItemCb(menu.querySelector('[data-action="delete"]'), async (item, _ev) => {
 			const moderator = item.getAttribute('data-moderator');
@@ -218,6 +219,7 @@ function follow(el) {
 	});
 }
 window.follow = follow;
+window.reportPost = reportPost;
 
 function checkForUpdates() {
 	const xhttp = new XMLHttpRequest();

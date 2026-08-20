@@ -12,7 +12,7 @@ export function initReportForm() {
 	modal.setupDone = true;
 }
 
-export function reportPost(id) {
+export function reportPost(id, base) {
 	const modal = document.getElementById('report-form-modal');
 	const form = modal.querySelector('form');
 	const formID = modal.querySelector('#report-post-id');
@@ -20,7 +20,7 @@ export function reportPost(id) {
 		return;
 	}
 
-	form.action = `/posts/${id}/report`;
+	form.action = `${base || '/posts'}/${id}/report`;
 	formID.value = id;
 
 	modal.hidden = false;

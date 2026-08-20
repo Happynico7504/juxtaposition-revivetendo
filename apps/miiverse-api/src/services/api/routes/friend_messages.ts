@@ -5,7 +5,6 @@ import moment from 'moment';
 import xmlbuilder from 'xmlbuilder';
 import * as z from 'zod';
 import {
-	getUserFriendPIDs,
 	getUserAccountData,
 	getValueFromQueryString,
 	getInvalidPostRegex
@@ -98,13 +97,6 @@ router.post('/', upload.none(), async function (request: express.Request, respon
 
 	if (!conversation) {
 		return serverError(response, ApiErrorCode.DATABASE_ERROR);
-	}
-
-	const friendPIDs = await getUserFriendPIDs(recipient.pid);
-
-	if (friendPIDs.indexOf(request.pid) === -1) {
-		request.log.warn('User isn\'t friend of recipient');
-		return badRequest(response, ApiErrorCode.NOT_ALLOWED, 403);
 	}
 
 	let miiFace = 'normal_face.png';
