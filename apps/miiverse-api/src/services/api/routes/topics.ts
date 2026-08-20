@@ -125,7 +125,7 @@ async function generateTopicsData(communities: HydratedCommunityDocument[]): Pro
 			}
 		});
 
-		const people = await getCommunityPeople(community, seenPeople);
+		const people = await getCommunityPeople(communityAndSubIDs, seenPeople);
 
 		for (const person of people) {
 			const post = Post.hydrate(person.post).json({
@@ -162,14 +162,14 @@ async function generateTopicsData(communities: HydratedCommunityDocument[]): Pro
 	};
 }
 
-async function getCommunityPeople(community: HydratedCommunityDocument, seenPeople: number[], hours = 24): Promise<{ _id: number; post: IPost }[]> {
+async function getCommunityPeople(communityIDs: string[], seenPeople: number[], hours = 24): Promise<{ _id: number; post: IPost }[]> {
 	const now = new Date();
 	const last24Hours = new Date(now.getTime() - hours * 60 * 60 * 1000);
 	const people = await Post.aggregate<{ _id: number; post: IPost }>([
 		{
 			$match: {
-				title_id: {
-					$in: community.title_id
+				community_id: {
+					$in: communityIDs
 				},
 				created_at: {
 					$gte: last24Hours
@@ -211,7 +211,7 @@ async function getCommunityPeople(community: HydratedCommunityDocument, seenPeop
 		// * Double the search range each time to get
 		// * exponentially more posts. This speeds up
 		// * the search at the cost of using older posts
-		return getCommunityPeople(community, seenPeople, hours * 2);
+		return getCommunityPeople(communityIDs, seenPeople, hours * 2);
 	}
 
 	return people;
