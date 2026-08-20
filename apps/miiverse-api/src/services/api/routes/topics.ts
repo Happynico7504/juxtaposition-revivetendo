@@ -81,10 +81,15 @@ async function generateTopicsData(communities: HydratedCommunityDocument[]): Pro
 	for (let i = 0; i < communities.length; i++) {
 		const community = communities[i];
 
+		const subCommunities = await Community.find({ parent: community.olive_community_id }, { olive_community_id: 1 });
+		const communityAndSubIDs = [community.olive_community_id, ...subCommunities.map(sub => sub.olive_community_id)];
+
 		const empathies = await Post.aggregate<{ _id: null; total: number }>([
 			{
 				$match: {
-					community_id: community.olive_community_id
+					community_id: {
+						$in: communityAndSubIDs
+					}
 				}
 			},
 			{
@@ -220,34 +225,33 @@ async function calculateMostPopularCommunities(hours: number, limit: number): Pr
 		throw new Error('Invalid date');
 	}
 
-	const validCommunities = await Community.aggregate<{ _id: null; communities: string[] }>([
-		{
-			$match: {
-				type: 0,
-				parent: null
-			}
-		},
-		{
-			$group: {
-				_id: null,
-				communities: {
-					$push: '$olive_community_id'
-				}
-			}
-		}
-	]);
+	const topLevelCommunities = await Community.find({ type: 0, parent: null });
 
-	const communityIDs = validCommunities[0]?.communities;
-
-	if (!communityIDs || communityIDs.length === 0) {
+	if (topLevelCommunities.length === 0) {
 		throw new Error('No communities found');
+	}
+
+	const topLevelIDs = topLevelCommunities.map(community => community.olive_community_id);
+
+	// * Posts made in a sub-community (e.g. WSC's per-sport clubs) should still
+	// * count toward the parent's popularity, so map every sub-community id back
+	// * to its top-level ancestor and include both in the post match.
+	const subCommunities = await Community.find({ parent: { $in: topLevelIDs } });
+	const idToTopLevel = new Map<string, string>();
+	for (const id of topLevelIDs) {
+		idToTopLevel.set(id, id);
+	}
+	for (const sub of subCommunities) {
+		if (sub.parent) {
+			idToTopLevel.set(sub.olive_community_id, sub.parent);
+		}
 	}
 
 	// * Can never find more popular communities than exist in total, so don't
 	// * chase a target the community count structurally can't reach.
-	const effectiveLimit = Math.min(limit, communityIDs.length);
+	const effectiveLimit = Math.min(limit, topLevelIDs.length);
 
-	const popularCommunities = await Post.aggregate<{ _id: null; count: number }>([
+	const postCounts = await Post.aggregate<{ _id: string; count: number }>([
 		{
 			$match: {
 				created_at: {
@@ -255,7 +259,7 @@ async function calculateMostPopularCommunities(hours: number, limit: number): Pr
 				},
 				message_to_pid: null,
 				community_id: {
-					$in: communityIDs
+					$in: Array.from(idToTopLevel.keys())
 				}
 			}
 		},
@@ -266,28 +270,34 @@ async function calculateMostPopularCommunities(hours: number, limit: number): Pr
 					$sum: 1
 				}
 			}
-		},
-		{
-			$limit: effectiveLimit
-		},
-		{
-			$sort: {
-				count: -1
-			}
 		}
 	]);
+
+	const totalsByTopLevel = new Map<string, number>();
+	for (const { _id, count } of postCounts) {
+		const topLevelID = idToTopLevel.get(_id);
+		if (!topLevelID) {
+			continue;
+		}
+		totalsByTopLevel.set(topLevelID, (totalsByTopLevel.get(topLevelID) ?? 0) + count);
+	}
+
+	const popularCommunityIDs = Array.from(totalsByTopLevel.entries())
+		.sort((a, b) => b[1] - a[1])
+		.slice(0, effectiveLimit)
+		.map(([id]) => id);
 
 	// * Keep expanding the search window until we hit the target, but stop once
 	// * we've gone back far enough that expanding further can't find anything new
 	// * (otherwise this recurses forever when fewer than `effectiveLimit`
 	// * communities have ever had any posts at all).
-	if (popularCommunities.length < effectiveLimit && last24Hours.getFullYear() >= 2020) {
+	if (popularCommunityIDs.length < effectiveLimit && last24Hours.getFullYear() >= 2020) {
 		return calculateMostPopularCommunities(hours + hours, limit);
 	}
 
 	return Community.find({
 		olive_community_id: {
-			$in: popularCommunities.map(({ _id }) => _id)
+			$in: popularCommunityIDs
 		}
 	});
 }
