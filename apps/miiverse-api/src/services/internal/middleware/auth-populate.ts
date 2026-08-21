@@ -1,6 +1,8 @@
 import { getUserAccountData, getUserDataFromServiceToken, getUserDataFromToken, getValueFromHeaders } from '@/util';
 import { errors } from '@/services/internal/errors';
 import { getUserContent, getUserSettings } from '@/database';
+import { Settings } from '@/models/settings';
+import { Content } from '@/models/content';
 import type express from 'express';
 import type { GetUserDataResponse } from '@pretendonetwork/grpc/account/v2/get_user_data_rpc';
 
@@ -27,8 +29,31 @@ export async function authPopulate(request: express.Request, response: express.R
 
 	if (pnid !== null) {
 		// Null here just means the initial setup isn't done
-		const settings = await getUserSettings(pnid.pid);
-		const content = await getUserContent(pnid.pid);
+		let settings = await getUserSettings(pnid.pid);
+		let content = await getUserContent(pnid.pid);
+
+		// Web (password) logins are already gated on having a real, previously-registered
+		// Wii U device - account-proxy's handleInternalAuth requires a wii_devices row
+		// (populated only by an actual console connecting once) before it will issue a
+		// token at all, for both the real-Pretendo-password path and the web_password_hash
+		// bypass path. So a web login reaching this point already proves prior Wii U
+		// ownership, same as it would for a console - the normal way these documents get
+		// created (a console's first-run flow) just isn't reachable for a user who's
+		// banned from Pretendo (and so can't get their Wii U through NASC), even though
+		// they're otherwise a legitimate user. Console logins (x-service-token) don't get
+		// this treatment: they still have their normal first-run flow available, and we
+		// don't want to guess at defaults on their behalf.
+		if (oAuthToken && (!settings || !content)) {
+			if (!settings) {
+				settings = await Settings.create({
+					pid: pnid.pid,
+					screen_name: pnid.mii?.name || pnid.username
+				});
+			}
+			if (!content) {
+				content = await Content.create({ pid: pnid.pid });
+			}
+		}
 
 		const moderator = accountIsModerator(pnid);
 		const developer = accountIsDeveloper(pnid);
