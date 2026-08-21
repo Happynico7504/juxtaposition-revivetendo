@@ -193,6 +193,7 @@ communitiesRouter.get('/:communityID/:type', async function (req, res) {
 
 	const canPost = !!self && isPostingAllowed(community, self, null);
 	const isUserFollowing = !!self && self.content.followed_communities.includes(community.olive_community_id);
+	const shotMode = getShotMode(community, (hasAuth() ? auth().paramPackData : null) ?? null);
 
 	const { data: subCommunitiesList } = await req.api.communities.list({ category: 'sub', limit: 90, parent_id: community.olive_community_id });
 	const subCommunities = subCommunitiesList.items;
@@ -231,7 +232,8 @@ communitiesRouter.get('/:communityID/:type', async function (req, res) {
 		hasSubCommunities: subCommunities.length > 0,
 		totalPosts: communityStats.totalPosts,
 		canPost,
-		isUserFollowing
+		isUserFollowing,
+		shotMode
 	};
 	res.jsxForDirectory({
 		web: (

@@ -6,6 +6,15 @@ let isPainting = false;
 let currentPen = drawPen1;
 let oldCursorPosition = null;
 let penColor = '#000';
+let undoStack = [];
+
+function undo() {
+	if (undoStack.length === 0) {
+		return;
+	}
+	ctx.putImageData(undoStack.pop(), 0, 0);
+}
+window.undo = undo;
 
 clearCanvas();
 
@@ -34,6 +43,7 @@ function clearCanvas() {
 	ctx.fillStyle = '#fff';
 	ctx.fillRect(0, 0, 320, 120);
 }
+window.clearCanvas = clearCanvas;
 
 function setPen(number) {
 	setTool(number, '#000');
@@ -141,6 +151,7 @@ function calcStraightLine(startCoordinates, endCoordinates) {
 }
 
 c.addEventListener('mousedown', (e) => {
+	undoStack.push(ctx.getImageData(0, 0, c.width, c.height));
 	oldCursorPosition = null;
 	isPainting = true;
 	draw(e);
@@ -149,6 +160,8 @@ c.addEventListener('mousedown', (e) => {
 c.addEventListener(
 	'touchstart',
 	(e) => {
+		e.preventDefault();
+		undoStack.push(ctx.getImageData(0, 0, c.width, c.height));
 		oldCursorPosition = null;
 		isPainting = true;
 		draw(e);
@@ -161,10 +174,18 @@ c.addEventListener('mouseup', () => {
 	oldCursorPosition = null;
 });
 
-c.addEventListener('touchend', () => {
+c.addEventListener('touchend', (e) => {
+	e.preventDefault();
 	isPainting = false;
 	oldCursorPosition = null;
 });
 
 c.addEventListener('mousemove', draw);
-c.addEventListener('touchmove', draw);
+c.addEventListener(
+	'touchmove',
+	(e) => {
+		e.preventDefault();
+		draw(e);
+	},
+	{ passive: false }
+);

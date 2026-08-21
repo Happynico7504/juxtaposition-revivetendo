@@ -102,10 +102,16 @@ export type PaintingUrls = {
  * @param postID Post ID.
  * @returns base64 TGAZ blob, sanitised.
  */
+const pngMagic = Buffer.from([0x89, 0x50, 0x4E, 0x47]);
+
 export async function uploadPainting(opts: ProcessPaintingOptions): Promise<PaintingUrls | null> {
 	const paintingBuf = Buffer.from(opts.blob.replace(/\0/g, '').trim(), 'base64');
 	const paintings = ((): Painting => {
-		if (opts.autodetectFormat) {
+		// Web posting sends a plain PNG straight from <canvas>.toDataURL(), not the
+		// TGAZ/BMPZ blob native Wii U/3DS clients produce. Detect and skip inflate.
+		if (paintingBuf.subarray(0, 4).equals(pngMagic)) {
+			return ImageMagick.read(paintingBuf, 'PNG', processPainting);
+		} else if (opts.autodetectFormat) {
 			return processAutozPainting(paintingBuf);
 		} else if (opts.isBmp) {
 			return processBmpPainting(paintingBuf);

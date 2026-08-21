@@ -164,6 +164,7 @@ postsRouter.get('/:post_id', async function (req, res) {
 	const replies = (await req.api.posts.list({ parent_id: post.id, include_replies: 'true', sort: 'oldest', limit: 500 }))?.data.items ?? [];
 	const postPNID = await getUserAccountData(post.pid);
 	const canPost = !!self && isPostingAllowed(community, self, post);
+	const shotMode = getShotMode(community, (hasAuth() ? auth().paramPackData : null) ?? null);
 
 	const props: PostPageViewProps = {
 		community,
@@ -171,6 +172,7 @@ postsRouter.get('/:post_id', async function (req, res) {
 		postPNID,
 		replies,
 		canPost,
+		shotMode,
 		userContent: self?.content ?? null
 	};
 	res.jsxForDirectory({

@@ -1067,6 +1067,10 @@ input[type="radio"] {
   z-index: 100;
 }
 
+.header-button.text-button {
+  font-size: 12.5px;
+}
+
 .feeling-selector.expression {
   display: flex;
   width: 100%;
@@ -1218,6 +1222,7 @@ input[type="radio"] {
   width: 100%;
   box-sizing: border-box;
   margin-bottom: 1em;
+  touch-action: none;
 }
 
 .painting-wrapper {
@@ -1871,6 +1876,10 @@ button.report {
   font-size: 25px;
   padding: 0;
   z-index: 100;
+}
+
+.header-button.text-button {
+  font-size: 12.5px;
 }
 
 @include t.media(">=tablet", "<desktop") {

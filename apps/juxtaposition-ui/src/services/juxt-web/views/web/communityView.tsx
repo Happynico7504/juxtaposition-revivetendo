@@ -3,12 +3,14 @@ import { WebRoot, WebWrapper } from '@/services/juxt-web/views/web/root';
 import { WebNavBar } from '@/services/juxt-web/views/web/navbar';
 import { WebReportModalView } from '@/services/juxt-web/views/web/reportModalView';
 import { WebPostListClosedView } from '@/services/juxt-web/views/web/postList';
+import { WebNewPostView } from '@/services/juxt-web/views/web/newPostView';
 import { useUrl } from '@/services/juxt-web/views/common/hooks/useUrl';
 import { T } from '@/services/juxt-web/views/common/components/T';
 import { WebInfobox, WebInfoboxButton, WebInfoboxButtons, WebInfoboxFollowButton, WebInfoboxStatBoxes } from '@/services/juxt-web/views/web/components/WebInfobox';
 import { useUser } from '@/services/juxt-web/views/common/hooks/useUser';
 import { WebCommunityIcon } from '@/services/juxt-web/views/web/components/ui/WebCommunityIcon';
 import type { ReactNode } from 'react';
+import type { CommunityShotMode } from '@/models/communities';
 import type { Community } from '@/api/generated';
 
 export type CommunityViewProps = {
@@ -18,6 +20,7 @@ export type CommunityViewProps = {
 	isUserFollowing: boolean;
 	hasSubCommunities: boolean;
 	feedType: number;
+	shotMode: CommunityShotMode;
 	children?: ReactNode;
 };
 
@@ -97,6 +100,20 @@ export function WebCommunityView(props: CommunityViewProps): ReactNode {
 					</WebInfoboxStatBoxes>
 				</WebInfobox>
 				<WebInfoboxButtons>
+					{props.canPost
+						? (
+								<button
+									id="header-post-button"
+									className="header-button text-button"
+									data-module-hide="community-page"
+									data-module-show="add-post-page"
+									data-header="true"
+									data-menu="true"
+								>
+									<T k="new_post.new_post_short" />
+								</button>
+							)
+						: null}
 					{props.hasSubCommunities
 						? (
 								<WebInfoboxButton href={`/titles/${community.olive_community_id}/related`}>
@@ -112,29 +129,38 @@ export function WebCommunityView(props: CommunityViewProps): ReactNode {
 							)
 						: null}
 				</WebInfoboxButtons>
-				<div className="buttons tabs">
-					<a
-						id="recent-tab"
-						className={cx({
-							selected: props.feedType === 0
-						})}
-						href={`/titles/${community.olive_community_id}/new`}
-					>
-						<T k="community.recent" />
-					</a>
-					<a
-						id="popular-tab"
-						className={cx({
-							selected: props.feedType === 1
-						})}
-						href={`/titles/${community.olive_community_id}/hot`}
-					>
-						<T k="community.popular" />
-					</a>
+				<div id="community-page">
+					<div className="buttons tabs">
+						<a
+							id="recent-tab"
+							className={cx({
+								selected: props.feedType === 0
+							})}
+							href={`/titles/${community.olive_community_id}/new`}
+						>
+							<T k="community.recent" />
+						</a>
+						<a
+							id="popular-tab"
+							className={cx({
+								selected: props.feedType === 1
+							})}
+							href={`/titles/${community.olive_community_id}/hot`}
+						>
+							<T k="community.popular" />
+						</a>
+					</div>
+					{!community.permissions.open ? <WebPostListClosedView /> : null}
+					{props.children}
 				</div>
-				{!community.permissions.open ? <WebPostListClosedView /> : null}
-				{props.children}
 			</WebWrapper>
+			<WebNewPostView
+				id={community.olive_community_id}
+				name={community.name}
+				url="/posts/new"
+				show="community-page"
+				shotMode={props.shotMode}
+			/>
 			<WebReportModalView />
 		</WebRoot>
 	);

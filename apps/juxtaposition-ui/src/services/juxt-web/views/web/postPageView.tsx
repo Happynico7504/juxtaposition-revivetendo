@@ -2,10 +2,12 @@ import { WebNavBar } from '@/services/juxt-web/views/web/navbar';
 import { WebRoot, WebWrapper } from '@/services/juxt-web/views/web/root';
 import { WebReportModalView } from '@/services/juxt-web/views/web/reportModalView';
 import { WebPostView } from '@/services/juxt-web/views/web/post';
+import { WebNewPostView } from '@/services/juxt-web/views/web/newPostView';
 import { useUrl } from '@/services/juxt-web/views/common/hooks/useUrl';
 import { T } from '@/services/juxt-web/views/common/components/T';
 import type { ReactNode } from 'react';
 import type { GetUserDataResponse } from '@pretendonetwork/grpc/account/get_user_data_rpc';
+import type { CommunityShotMode } from '@/models/communities';
 import type { Community, Post, SelfContent } from '@/api/generated';
 
 export type PostPageViewProps = {
@@ -15,6 +17,7 @@ export type PostPageViewProps = {
 	community: Community;
 	replies: Post[];
 	canPost: boolean;
+	shotMode: CommunityShotMode;
 };
 
 function PostHead(props: PostPageViewProps): ReactNode {
@@ -74,6 +77,20 @@ export function WebPostPageView(props: PostPageViewProps): ReactNode {
 			<div id="toast"></div>
 			<div className="community-page-post-box" id="post">
 				<WebWrapper>
+					{!props.post.removed && props.canPost
+						? (
+								<button
+									id="header-post-button"
+									className="header-button text-button"
+									data-module-hide="post"
+									data-module-show="add-post-page"
+									data-header="true"
+									data-menu="true"
+								>
+									<T k="post.reply_post" />
+								</button>
+							)
+						: null}
 					<WebPostView post={props.post} userContent={props.userContent} isMainPost />
 					<span className="replies-line" />
 					{props.replies.map(replyPost => (
@@ -84,6 +101,13 @@ export function WebPostPageView(props: PostPageViewProps): ReactNode {
 					))}
 				</WebWrapper>
 			</div>
+			<WebNewPostView
+				id={props.community.olive_community_id}
+				pid={props.post.pid}
+				url={`/posts/${props.post.id}/new`}
+				show="post"
+				shotMode={props.shotMode}
+			/>
 			<WebReportModalView />
 		</WebRoot>
 	);

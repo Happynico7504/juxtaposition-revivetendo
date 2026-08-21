@@ -343,14 +343,17 @@ function closePainting(save) {
 	const paintingArea = document.getElementById('new-post-memo');
 	const paintingOverlay = document.getElementById('painting-wrapper');
 	const memo = document.getElementById('memo');
+	const memoValue = document.getElementById('memo-value');
 	const c = document.getElementById('painting');
 
-	if (!paintingOverlay || !paintingArea || !memo) {
+	if (!paintingOverlay || !paintingArea || !memo || !memoValue) {
 		return;
 	}
 
 	if (save) {
-		memo.src = c.toDataURL();
+		const dataUrl = c.toDataURL();
+		memo.src = dataUrl;
+		memoValue.value = dataUrl.substring(dataUrl.indexOf(',') + 1);
 	}
 
 	paintingOverlay.style.display = 'none';
