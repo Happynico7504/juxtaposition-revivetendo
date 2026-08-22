@@ -79,7 +79,7 @@ export function PortalMessagesView(props: MessagesViewProps): ReactNode {
 														</span>
 														<span className="id-name">
 															@
-															{cache.getUserName(userObj.pid)}
+															{props.usernames[userObj.pid] ?? cache.getUserName(userObj.pid)}
 														</span>
 													</p>
 													<span className="timestamp">

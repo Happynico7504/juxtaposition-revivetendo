@@ -14,6 +14,9 @@ export type ConversationUserModel = ConversationModel['users'][number];
 
 export type MessagesViewProps = {
 	conversations: ConversationModel[];
+	/** Map of pid -> real PNID username, so people who share a Mii nickname
+	 *  with someone else don't render as indistinguishable "duplicate" rows. */
+	usernames: Record<number, string>;
 };
 
 export function WebMessagesView(props: MessagesViewProps): ReactNode {
@@ -77,7 +80,7 @@ export function WebMessagesView(props: MessagesViewProps): ReactNode {
 														</span>
 														<span className="timestamp">
 															@
-															{cache.getUserName(userObj.pid)}
+															{props.usernames[userObj.pid] ?? cache.getUserName(userObj.pid)}
 														</span>
 													</span>
 													<span className="text">

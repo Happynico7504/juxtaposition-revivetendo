@@ -2,6 +2,7 @@ import express from 'express';
 import { z } from 'zod';
 import { parseReq } from '@/services/juxt-web/routes/routeUtils';
 import { PortalWSCPlayersView, PortalWSCPlayersBodyOnly } from '@/services/juxt-web/views/portal/wscPlayersView';
+import { CtrWSCPlayersView } from '@/services/juxt-web/views/ctr/wscPlayersView';
 import type { WSCPlayersData } from '@/services/juxt-web/views/portal/wscPlayersView';
 
 export const wscPlayersRouter = express.Router();
@@ -29,6 +30,7 @@ wscPlayersRouter.get('/', async function (req, res) {
 	}
 
 	return res.jsxForDirectory({
-		portal: <PortalWSCPlayersView data={data} />
+		portal: <PortalWSCPlayersView data={data} />,
+		ctr: <CtrWSCPlayersView data={data} />
 	});
 });

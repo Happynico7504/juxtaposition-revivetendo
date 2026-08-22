@@ -32,6 +32,10 @@ const schema = z.object({
 	cdnDomain: z.string(),
 	/** Console-specific CDN override (Wii U/3DS). Falls back to cdnDomain if unset. */
 	cdnDomainConsole: z.string().optional(),
+	/** 3DS-specific CDN override. Falls back to cdnDomainConsole, then cdnDomain, if unset.
+	 *  Needed because 3DS's AddRootCA cave only fits a 2048-bit CA, so it can't trust
+	 *  cdnDomainConsole's cert when that's signed by the (4096-bit) Wii U CA. */
+	cdnDomainCtr: z.string().optional(),
 	/** Value for X-Nintedo-Whitelist header. */
 	whitelist: z.string(),
 	/** Environment (prod/test/dev) to use for Discovery and access_level control. */

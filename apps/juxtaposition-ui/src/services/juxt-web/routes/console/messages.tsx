@@ -31,12 +31,35 @@ export const messagesRouter = express.Router();
 
 messagesRouter.get('/', async function (req, res) {
 	const { auth } = parseReq(req);
-	const conversations = await database.getConversations(auth().pid);
+	const selfPid = auth().pid;
+	const conversations = await database.getConversations(selfPid);
+
+	// Mii nicknames aren't unique - two different people can share one, which
+	// makes their conversations indistinguishable (and look like duplicates)
+	// if only the nickname is shown. Resolve the real PNID per conversation
+	// partner so the "@username" line actually disambiguates them.
+	const otherPids = new Set<number>();
+	for (const convo of conversations) {
+		for (const convoUser of convo.users) {
+			if (convoUser.pid && convoUser.pid !== selfPid) {
+				otherPids.add(convoUser.pid);
+			}
+		}
+	}
+	const usernames: Record<number, string> = {};
+	await Promise.all([...otherPids].map(async (pid) => {
+		try {
+			const account = await getUserAccountData(pid);
+			usernames[pid] = account.username;
+		} catch {
+			// Leave unresolved - views fall back to the Mii nickname.
+		}
+	}));
+
 	res.jsxForDirectory({
-		web: <WebMessagesView conversations={conversations} />,
-		portal: <PortalMessagesView conversations={conversations} />,
-		ctr: <CtrMessagesView conversations={conversations} />,
-		disableDoctypeFor: ['ctr']
+		web: <WebMessagesView conversations={conversations} usernames={usernames} />,
+		portal: <PortalMessagesView conversations={conversations} usernames={usernames} />,
+		ctr: <CtrMessagesView conversations={conversations} usernames={usernames} />
 	});
 });
 

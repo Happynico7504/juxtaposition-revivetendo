@@ -119,6 +119,17 @@ export function CtrUserPageView(props: UserPageViewProps): ReactNode {
 								</CtrPageButton>
 							)
 						: null}
+
+					{isSelf
+						? (
+								<CtrPageButton
+									type="middle"
+									href="/wsc-players"
+								>
+									WSC Players
+								</CtrPageButton>
+							)
+						: null}
 				</CtrPageButtons>
 
 				<div className="body-content tab2-content" id="community-post-list">
@@ -141,13 +152,6 @@ export function CtrUserPageView(props: UserPageViewProps): ReactNode {
 							<CtrNavTab href={props.baseLink + 'yeahs'} selected={props.selectedTab === 4}>
 								<T k="global.yeahs" />
 							</CtrNavTab>
-							{isSelf
-								? (
-										<CtrNavTab href="/news/friend_requests">
-											<T k="user_page.friend_requests" />
-										</CtrNavTab>
-									)
-								: null }
 						</CtrNavTabsRow>
 					</CtrNavTabs>
 					<div className="tab-body post-list">

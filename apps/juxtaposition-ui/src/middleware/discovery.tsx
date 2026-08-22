@@ -30,8 +30,12 @@ export const checkDiscovery: RequestHandler = async (request, response, next) =>
 	} else {
 		request.guest_access = discovery ? discovery.guest_access : false;
 		request.new_users = discovery ? discovery.new_users : false;
-		const isConsole = request.directory === 'portal' || request.directory === 'ctr';
-		response.locals.cdnURL = isConsole && config.cdnDomainConsole ? config.cdnDomainConsole : config.cdnDomain;
+		if (request.directory === 'ctr' && config.cdnDomainCtr) {
+			response.locals.cdnURL = config.cdnDomainCtr;
+		} else {
+			const isConsole = request.directory === 'portal' || request.directory === 'ctr';
+			response.locals.cdnURL = isConsole && config.cdnDomainConsole ? config.cdnDomainConsole : config.cdnDomain;
+		}
 	}
 
 	next();
