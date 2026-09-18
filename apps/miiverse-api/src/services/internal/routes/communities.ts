@@ -4,6 +4,7 @@ import { standardSortSchema, standardSortToDirection } from '@/services/internal
 import { guards } from '@/services/internal/middleware/guards';
 import { mapPage, pageControlSchema, pageDtoSchema } from '@/services/internal/contract/page';
 import { Community } from '@/models/community';
+import { resolveCommunityIdAlias } from '@/database';
 import { deleteOptional } from '@/services/internal/utils';
 import { COMMUNITY_TYPE } from '@/types/mongoose/community';
 import { categoryToCommunityTypes, communityCategory, communitySchema, communityStatsSchema, mapCommunity, mapCommunityStats } from '@/services/internal/contract/community';
@@ -116,7 +117,7 @@ communitiesRouter.get({
 				};
 
 		const community = await Community.findOne(deleteOptional({
-			olive_community_id: params.id,
+			olive_community_id: await resolveCommunityIdAlias(params.id),
 			...typesToFilter
 		}));
 		if (!community) {
@@ -150,6 +151,8 @@ communitiesRouter.get({
 		if (params.id.startsWith('tid:')) {
 			communityId = undefined;
 			titleId = params.id.slice(4);
+		} else {
+			communityId = await resolveCommunityIdAlias(params.id);
 		}
 
 		const typesToFilter: RootFilterQuery<ICommunity> = auth?.moderator

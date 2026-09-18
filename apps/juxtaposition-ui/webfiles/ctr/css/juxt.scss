@@ -482,3 +482,20 @@ p.settings-label {
 	float: left;
 	width: 275px;
 }
+.post a.report-message-link {
+    display: block;
+    padding: 0 5px 5px;
+    font-size: 12px;
+    color: #673db6;
+    text-align: right;
+}
+
+/* DM images: scale to the bubble, keep aspect ratio */
+.message-viewer-bubble-sent-screenshot,
+.message-viewer-bubble-sent-memo {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    -webkit-box-sizing: border-box;
+}

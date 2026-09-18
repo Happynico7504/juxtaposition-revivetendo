@@ -6,6 +6,8 @@ import { useCache } from '@/services/juxt-web/views/common/hooks/useCache';
 import { useUser } from '@/services/juxt-web/views/common/hooks/useUser';
 import { CtrMiiIcon } from '@/services/juxt-web/views/ctr/components/ui/CtrMiiIcon';
 import { T } from '@/services/juxt-web/views/common/components/T';
+import { CtrPageTitledHeader } from '@/services/juxt-web/views/ctr/components/CtrPageHeader';
+import { CtrPageButton, CtrPageButtons } from '@/services/juxt-web/views/ctr/components/CtrPageButtons';
 import type { ReactNode } from 'react';
 import type { MessageThreadItemProps, MessageThreadViewProps } from '@/services/juxt-web/views/web/messageThread';
 
@@ -36,22 +38,22 @@ function MessageThreadItem(props: MessageThreadItemProps): ReactNode {
 			<CtrMiiIcon pid={msg.pid ?? 0} face_url={msg.mii_face_url ?? undefined}></CtrMiiIcon>
 			<header>
 				<span className="timestamp">{moment(msg.created_at).fromNow()}</span>
-				{!isOwn
-					? (
-							<a
-								className="report-message-link"
-								href={`/friend_messages/${props.conversationId}/${msg.id}/report`}
-								data-pjax="#body"
-							>
-								<T k="post.report_post" />
-							</a>
-						)
-					: null}
 			</header>
 			<div className="post-body">
 				{screenshotContent}
 				{content}
 			</div>
+			{!isOwn
+				? (
+						<a
+							className="report-message-link"
+							href={`/friend_messages/${props.conversationId}/${msg.id}/report`}
+							data-pjax="#body"
+						>
+							<T k="post.report_post" />
+						</a>
+					)
+				: null}
 		</div>
 	);
 }
@@ -73,18 +75,15 @@ export function CtrMessageThreadView(props: MessageThreadViewProps): ReactNode {
 			onLoad="window.scrollTo(0, 500000);"
 		>
 			<CtrPageBody>
-				<header id="header" className="buttons" data-toolbar-mode="normal">
-					<h1 id="page-title">{otherUserName}</h1>
-					<a
-						id="header-post-button"
-						className="header-button left"
-						href={`/friend_messages/${props.conversation.id}/create`}
-						data-pjax="#body"
-					>
+				<CtrPageTitledHeader data-toolbar-mode="normal">
+					{otherUserName}
+				</CtrPageTitledHeader>
+				<CtrPageButtons>
+					<CtrPageButton type="left" href={`/friend_messages/${props.conversation.id}/create`}>
 						<T k="new_post.new_post_short" />
 						{' +'}
-					</a>
-				</header>
+					</CtrPageButton>
+				</CtrPageButtons>
 				<div className="body-content message-post-list" id="message-page">
 					{props.messages.map(msg => <MessageThreadItem key={msg.id} message={msg} conversationId={props.conversation.id} />)}
 				</div>

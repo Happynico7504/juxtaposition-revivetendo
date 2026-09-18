@@ -80,6 +80,49 @@ export async function getCommunityByID(communityID: string): Promise<HydratedCom
 	});
 }
 
+// 32-bit game clients (WSC and friends) only ever see a community's ID as a u32:
+// nn::olv's GetCommunityId() truncates the 64-bit community_id our seeded
+// communities carry (Archiverse GameIDs), so the Miiverse applet then asks for
+// e.g. 312600382 instead of 14866558073079719742 and gets a 404. Map such a
+// truncated ID back to the one community whose full ID ends in the same 32 bits.
+// Native communities have IDs under 32 bits and are returned unchanged.
+let truncatedIdMap: { built: number; map: Map<string, string> } | null = null;
+const TRUNCATED_ID_TTL_MS = 60_000;
+
+export async function resolveCommunityIdAlias(communityID: string): Promise<string> {
+	if (!/^\d{1,10}$/.test(communityID)) {
+		return communityID;
+	}
+	verifyConnected();
+
+	if (await Community.exists({ olive_community_id: communityID })) {
+		return communityID;
+	}
+
+	const now = Date.now();
+	if (!truncatedIdMap || now - truncatedIdMap.built > TRUNCATED_ID_TTL_MS) {
+		const map = new Map<string, string>();
+		const wide = await Community
+			.find({ $expr: { $gt: [{ $strLenCP: '$olive_community_id' }, 10] } }, { olive_community_id: 1 })
+			.lean();
+		for (const c of wide) {
+			const full = c.olive_community_id;
+			if (!/^\d+$/.test(full)) {
+				continue;
+			}
+			const truncated = (BigInt(full) & 0xFFFFFFFFn).toString();
+			// Two communities sharing their low 32 bits would be ambiguous - keep
+			// the first rather than silently picking a different one each time.
+			if (!map.has(truncated)) {
+				map.set(truncated, full);
+			}
+		}
+		truncatedIdMap = { built: now, map };
+	}
+
+	return truncatedIdMap.map.get(communityID) ?? communityID;
+}
+
 export async function getPostByID(postID: string): Promise<HydratedPostDocument | null> {
 	verifyConnected();
 

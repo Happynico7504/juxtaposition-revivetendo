@@ -4,6 +4,7 @@ import { deleteOptional, filterRemovedPosts } from '@/services/internal/utils';
 import { guards } from '@/services/internal/middleware/guards';
 import { mapPost, postSchema } from '@/services/internal/contract/post';
 import { feedPageDtoSchema, mapFeedPage, pageControlSchema } from '@/services/internal/contract/page';
+import { resolveCommunityIdAlias } from '@/database';
 import { createInternalApiRouter } from '@/services/internal/builder/router';
 
 export const communityPostsRouter = createInternalApiRouter();
@@ -22,7 +23,7 @@ communityPostsRouter.get({
 	async handler({ params, query, auth }) {
 		const posts = await Post
 			.find(deleteOptional({
-				community_id: params.id,
+				community_id: await resolveCommunityIdAlias(params.id),
 				parent: null,
 				message_to_pid: null, // messages aren't really posts
 				...filterRemovedPosts(auth)
@@ -49,7 +50,7 @@ communityPostsRouter.get({
 	async handler({ params, query, auth }) {
 		const posts = await Post
 			.find(deleteOptional({
-				community_id: params.id,
+				community_id: await resolveCommunityIdAlias(params.id),
 				parent: null,
 				...filterRemovedPosts(auth)
 			}))

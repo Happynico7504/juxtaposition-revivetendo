@@ -5,6 +5,7 @@ import { humanFromNow } from '@/util';
 import { useCache } from '@/services/juxt-web/views/common/hooks/useCache';
 import { useUser } from '@/services/juxt-web/views/common/hooks/useUser';
 import { T } from '@/services/juxt-web/views/common/components/T';
+import { CtrPageTitledHeader } from '@/services/juxt-web/views/ctr/components/CtrPageHeader';
 import type { ReactNode } from 'react';
 import type {
 	ConversationUserModel,
@@ -19,9 +20,9 @@ export function CtrMessagesView(props: MessagesViewProps): ReactNode {
 	return (
 		<CtrRoot title={T.str('global.messages')}>
 			<CtrPageBody>
-				<header id="header" data-toolbar-mode="normal">
-					<h1 id="page-title"><T k="global.messages" /></h1>
-				</header>
+				<CtrPageTitledHeader data-toolbar-mode="normal">
+					<T k="global.messages" />
+				</CtrPageTitledHeader>
 				<div className="body-content" id="messages-list">
 					<ul
 						className="list-content-with-icon-column arrow-list"

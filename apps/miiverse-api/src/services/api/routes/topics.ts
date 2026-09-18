@@ -47,7 +47,7 @@ router.get('/', async function (request: express.Request, response: express.Resp
 	// }
 
 	if (!WARA_WARA_PLAZA_CACHE.valid()) {
-		const communities = await calculateMostPopularCommunities(24, 10);
+		const communities = await selectRandomCommunities(10);
 
 		if (communities.length === 0) {
 			request.log.warn('No communities exist for topics request');
@@ -76,6 +76,12 @@ async function generateTopicsData(communities: HydratedCommunityDocument[]): Pro
 		topic: WWPTopic;
 	}[] = [];
 
+	// * A person should only ever appear once across the whole result, not in
+	// * multiple communities at once. Which communities get first claim on a
+	// * shared pool of eligible people is randomized by selectRandomCommunities'
+	// * own shuffle (communities are processed here in that same random order),
+	// * so this no longer systematically starves the same communities every
+	// * time the way a fixed processing order would.
 	const seenPeople: number[] = [];
 
 	for (let i = 0; i < communities.length; i++) {
@@ -115,7 +121,11 @@ async function generateTopicsData(communities: HydratedCommunityDocument[]): Pro
 			is_recommended: community.is_recommended ? 1 : 0,
 			name: community.name,
 			people: [],
-			position: i + 1
+			// * Set below, once we know this topic survives the empty-people
+			// * filter - must stay contiguous among only the topics actually
+			// * included (see the filename-gap lesson from sysmsg: a real
+			// * console choked on a non-contiguous sequence there too).
+			position: 0
 		};
 
 		community.title_id.forEach((title_id) => {
@@ -135,6 +145,19 @@ async function generateTopicsData(communities: HydratedCommunityDocument[]): Pro
 
 			post.community_id = 0xFFFFFFFF; // * Make this match above. This is how it was in the real WWP. Unsure why, but it works
 
+			// * Post.json() defaults title_id to '' when the post itself has
+			// * none set (e.g. posts made in a generic non-game community
+			// * like Off-topic never had one to record) - confirmed live
+			// * 2026-08-25 that a real console renders the whole topic
+			// * (icon, name) but shows no post/person content at all when
+			// * its posts carry an empty title_id, while topics whose posts
+			// * have a real one display fine. Fall back to the community's
+			// * own title_id here specifically for WWP, rather than changing
+			// * the shared Post model default used elsewhere in the app.
+			if (!post.title_id && community.title_id[0]) {
+				post.title_id = community.title_id[0];
+			}
+
 			topic.people.push({
 				person: {
 					posts: [
@@ -147,6 +170,19 @@ async function generateTopicsData(communities: HydratedCommunityDocument[]): Pro
 
 			seenPeople.push(person._id);
 		}
+
+		// * Skip communities with fewer than 2 people entirely, rather than
+		// * sending a thin topic the console just renders as empty/blank -
+		// * confirmed live 2026-08-25 that a topic with exactly 1 person
+		// * renders empty on a real console just like one with 0, while
+		// * topics with several people (9, 17) render fine. Exact minimum
+		// * threshold isn't confirmed beyond ">1"; drop at <2 rather than
+		// * guess higher and lose more real content than necessary.
+		if (topic.people.length < 2) {
+			continue;
+		}
+
+		topic.position = topics.length + 1;
 
 		topics.push({
 			topic: topic
@@ -162,25 +198,31 @@ async function generateTopicsData(communities: HydratedCommunityDocument[]): Pro
 	};
 }
 
-async function getCommunityPeople(communityIDs: string[], seenPeople: number[], hours = 24): Promise<{ _id: number; post: IPost }[]> {
-	const now = new Date();
-	const last24Hours = new Date(now.getTime() - hours * 60 * 60 * 1000);
-	const people = await Post.aggregate<{ _id: number; post: IPost }>([
+async function getCommunityPeople(communityIDs: string[], seenPeople: number[]): Promise<{ _id: number; post: IPost }[]> {
+	// * All-time instead of a recent-hours window with an expanding-window
+	// * fallback (previously started at 24h and doubled until 20+ people were
+	// * found or the window reached back before 2020) - with as few real
+	// * posters as currently exist, that fallback was already expanding all
+	// * the way back for most communities in practice anyway, so this is more
+	// * honest about what actually happens and simpler.
+	return Post.aggregate<{ _id: number; post: IPost }>([
 		{
 			$match: {
 				community_id: {
 					$in: communityIDs
 				},
-				created_at: {
-					$gte: last24Hours
-				},
 				message_to_pid: null,
 				parent: null,
 				removed: false,
 				pid: {
-					// * Exclude people we have seen in other communities.
-					// * This increases generation time, but ensures the
-					// * max number of slots we can fill end up getting used
+					// * Exclude people already shown in another community - a
+					// * person should only appear once across the whole
+					// * result. Which community gets first claim on a shared
+					// * person is now randomized (selectRandomCommunities'
+					// * shuffle decides processing order), and a community
+					// * left with zero people afterward is dropped entirely
+					// * (see generateTopicsData) rather than sent as a blank
+					// * "?" slot.
 					$nin: seenPeople
 				}
 			}
@@ -194,112 +236,73 @@ async function getCommunityPeople(communityIDs: string[], seenPeople: number[], 
 			}
 		},
 		{
-			$limit: 70 // * Arbitrary
+			$sample: { size: 70 } // * Random selection instead of natural/insertion order. Size arbitrary, same as before.
 		}
 	]);
-
-	// TODO - Remove this check once out of beta and have more users
-	// * We only do this because Juxtaposition is not super active
-	// * due to it being in beta. If we don't expand the search
-	// * time range then WWP still ends up fairly empty
-	// *
-	// * Ensure we have at *least* 20 people. Arbitrary.
-	// * If the year is less than 2020, assume we've gone
-	// * too far back. There are no more posts, just return
-	// * what was found
-	if (people.length < 20 && last24Hours.getFullYear() >= 2020) {
-		// * Double the search range each time to get
-		// * exponentially more posts. This speeds up
-		// * the search at the cost of using older posts
-		return getCommunityPeople(communityIDs, seenPeople, hours * 2);
-	}
-
-	return people;
 }
 
-async function calculateMostPopularCommunities(hours: number, limit: number): Promise<HydratedCommunityDocument[]> {
-	const now = new Date();
-	const last24Hours = new Date(now.getTime() - hours * 60 * 60 * 1000);
+async function selectRandomCommunities(limit: number): Promise<HydratedCommunityDocument[]> {
+	// * Pure random selection instead of ranking by post/empathy count - with
+	// * only a handful of real active communities and posters right now,
+	// * "most popular" just means "whichever few happened to post most
+	// * recently", which isn't meaningfully different from random anyway,
+	// * and random avoids always showing the exact same communities.
+	// *
+	// * Top-level only (type 0) - briefly tried also allowing sub-communities
+	// * (type 1) as independent topics, but a real console refused to show
+	// * them (confirmed live 2026-08-25). Root cause looks structural, not a
+	// * missing/wrong field: getCommunityByTitleID's own comment notes that
+	// * every sub-community under a region shares its parent's exact
+	// * title_id array, so resolving a topic's title_id back to a community
+	// * is inherently ambiguous between a sub and its own parent - if the
+	// * console does any consistency check when opening a Plaza entry, a
+	// * sub's topic would very plausibly fail it regardless of what other
+	// * fields (like parent) claim, since the ambiguity is between multiple
+	// * different documents sharing one title_id, not a property of any
+	// * single one. Reverted rather than chasing a per-field workaround for
+	// * that.
+	const topLevelCommunities = await Community.find({ type: 0 });
 
-	if (!last24Hours) {
-		throw new Error('Invalid date');
+	// * Only consider communities that actually have at least one real post
+	// * (directly or via a sub-community rolled into it) - a community with
+	// * none would just get dropped as empty later anyway (see
+	// * generateTopicsData), so exclude it from the random draw up front
+	// * instead of wasting a slot on a guaranteed-empty pick.
+	const communityIDsWithPosts = new Set(
+		await Post.distinct('community_id', { message_to_pid: null, parent: null, removed: false })
+	);
+	const subsByParent = new Map<string, string[]>();
+	for (const c of await Community.find({ type: 1 }, { olive_community_id: 1, parent: 1 })) {
+		if (c.parent) {
+			const list = subsByParent.get(c.parent) ?? [];
+			list.push(c.olive_community_id);
+			subsByParent.set(c.parent, list);
+		}
 	}
+	const eligibleCommunities = topLevelCommunities.filter(c => {
+		if (communityIDsWithPosts.has(c.olive_community_id)) {
+			return true;
+		}
+		const subs = subsByParent.get(c.olive_community_id) ?? [];
+		return subs.some(subID => communityIDsWithPosts.has(subID));
+	});
 
-	const topLevelCommunities = await Community.find({ type: 0, parent: null });
-
-	if (topLevelCommunities.length === 0) {
+	if (eligibleCommunities.length === 0) {
 		throw new Error('No communities found');
 	}
 
-	const topLevelIDs = topLevelCommunities.map(community => community.olive_community_id);
+	const effectiveLimit = Math.min(limit, eligibleCommunities.length);
 
-	// * Posts made in a sub-community (e.g. WSC's per-sport clubs) should still
-	// * count toward the parent's popularity, so map every sub-community id back
-	// * to its top-level ancestor and include both in the post match.
-	const subCommunities = await Community.find({ parent: { $in: topLevelIDs } });
-	const idToTopLevel = new Map<string, string>();
-	for (const id of topLevelIDs) {
-		idToTopLevel.set(id, id);
-	}
-	for (const sub of subCommunities) {
-		if (sub.parent) {
-			idToTopLevel.set(sub.olive_community_id, sub.parent);
-		}
+	// * Fisher-Yates shuffle, then take the first effectiveLimit - the
+	// * community count here is always small, so this is cheaper and
+	// * simpler than a database-side $sample.
+	const shuffled = [...eligibleCommunities];
+	for (let i = shuffled.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
 	}
 
-	// * Can never find more popular communities than exist in total, so don't
-	// * chase a target the community count structurally can't reach.
-	const effectiveLimit = Math.min(limit, topLevelIDs.length);
-
-	const postCounts = await Post.aggregate<{ _id: string; count: number }>([
-		{
-			$match: {
-				created_at: {
-					$gte: last24Hours
-				},
-				message_to_pid: null,
-				community_id: {
-					$in: Array.from(idToTopLevel.keys())
-				}
-			}
-		},
-		{
-			$group: {
-				_id: '$community_id',
-				count: {
-					$sum: 1
-				}
-			}
-		}
-	]);
-
-	const totalsByTopLevel = new Map<string, number>();
-	for (const { _id, count } of postCounts) {
-		const topLevelID = idToTopLevel.get(_id);
-		if (!topLevelID) {
-			continue;
-		}
-		totalsByTopLevel.set(topLevelID, (totalsByTopLevel.get(topLevelID) ?? 0) + count);
-	}
-
-	const popularCommunityIDs = Array.from(totalsByTopLevel.entries())
-		.sort((a, b) => b[1] - a[1])
-		.slice(0, effectiveLimit)
-		.map(([id]) => id);
-
-	// * Keep expanding the search window until we hit the target, but stop once
-	// * we've gone back far enough that expanding further can't find anything new
-	// * (otherwise this recurses forever when fewer than `effectiveLimit`
-	// * communities have ever had any posts at all).
-	if (popularCommunityIDs.length < effectiveLimit && last24Hours.getFullYear() >= 2020) {
-		return calculateMostPopularCommunities(hours + hours, limit);
-	}
-
-	return Community.find({
-		olive_community_id: {
-			$in: popularCommunityIDs
-		}
-	});
+	return shuffled.slice(0, effectiveLimit);
 }
 
 export default router;

@@ -19,10 +19,15 @@ export type WSCGathering = {
 	players: WSCPlayer[];
 };
 
+export type WSCNatShame = WSCPlayer & {
+	blocked_until: number; // unix seconds
+};
+
 export type WSCPlayersData = {
 	server_up: boolean;
 	players: WSCPlayer[];
 	gatherings: WSCGathering[];
+	nat_hall_of_shame?: WSCNatShame[];
 };
 
 export type WSCPlayersViewProps = {
@@ -33,25 +38,31 @@ function WSCPlayersBody({ data }: WSCPlayersViewProps): ReactNode {
 	return (
 		<div className="body-content" id="wsc-players">
 			<style>{`
-				#wsc-players { padding: 0 8px; }
-				.wsc-section-title { font-size: 14px; font-weight: bold; color: #666; margin: 12px 0 6px; padding-bottom: 4px; border-bottom: 1px solid #e0e0e0; }
+				#wsc-players { padding: 0 16px; }
+				.wsc-section-title { font-size: 28px; font-weight: bold; color: #666; margin: 24px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #e0e0e0; }
 				.wsc-player-list { list-style: none; margin: 0; padding: 0; }
-				.wsc-player-item { display: flex; align-items: center; padding: 6px 4px; border-bottom: 1px solid #f0f0f0; }
-				.wsc-player-item .icon-container { margin-right: 8px; flex-shrink: 0; }
-				.wsc-player-item .icon-container .mii-icon { width: 40px; height: 40px; }
-				.wsc-player-name { font-size: 13px; font-weight: bold; }
-				.wsc-player-pnid { font-size: 11px; color: #888; }
-				.wsc-gathering { background: #f7f7f7; border-radius: 6px; margin-bottom: 8px; padding: 8px 10px; }
-				.wsc-gathering-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-				.wsc-gathering-sport { font-size: 13px; font-weight: bold; }
-				.wsc-gathering-count { font-size: 11px; color: #888; }
-				.wsc-gathering-players { display: flex; gap: 8px; flex-wrap: wrap; }
-				.wsc-gathering-player { display: flex; align-items: center; gap: 4px; }
-				.wsc-gathering-player .mii-icon { width: 32px; height: 32px; }
-				.wsc-gathering-player-name { font-size: 11px; }
-				.wsc-offline { color: #999; font-size: 13px; padding: 16px 4px; text-align: center; }
-				.wsc-open-badge { font-size: 10px; background: #4caf50; color: #fff; border-radius: 3px; padding: 1px 5px; }
-				.wsc-closed-badge { font-size: 10px; background: #e53935; color: #fff; border-radius: 3px; padding: 1px 5px; }
+				.wsc-player-item { display: flex; align-items: center; padding: 12px 8px; border-bottom: 1px solid #f0f0f0; }
+				.wsc-player-item .icon-container { margin-right: 16px; flex-shrink: 0; }
+				.wsc-player-item .icon-container .mii-icon { width: 80px; height: 80px; }
+				.wsc-player-name { font-size: 26px; font-weight: bold; }
+				.wsc-player-pnid { font-size: 22px; color: #888; }
+				.wsc-gathering { background: #f7f7f7; border-radius: 12px; margin-bottom: 16px; padding: 16px 20px; }
+				.wsc-gathering-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+				.wsc-gathering-sport { font-size: 26px; font-weight: bold; }
+				.wsc-gathering-count { font-size: 22px; color: #888; }
+				.wsc-gathering-players { display: flex; gap: 16px; flex-wrap: wrap; }
+				.wsc-gathering-player { display: flex; align-items: center; gap: 8px; }
+				.wsc-gathering-player .mii-icon { width: 64px; height: 64px; }
+				.wsc-gathering-player-name { font-size: 22px; }
+				.wsc-offline { color: #999; font-size: 26px; padding: 32px 8px; text-align: center; }
+				.wsc-open-badge { font-size: 20px; background: #4caf50; color: #fff; border-radius: 6px; padding: 2px 10px; }
+				.wsc-closed-badge { font-size: 20px; background: #e53935; color: #fff; border-radius: 6px; padding: 2px 10px; }
+				.wsc-shame-list { list-style: none; margin: 0; padding: 0; }
+				.wsc-shame-item { display: flex; align-items: center; padding: 12px 8px; border-bottom: 1px solid #f0f0f0; }
+				.wsc-shame-item .icon-container { margin-right: 16px; flex-shrink: 0; }
+				.wsc-shame-item .icon-container .mii-icon { width: 80px; height: 80px; opacity: 0.6; }
+				.wsc-shame-name { font-size: 26px; font-weight: bold; }
+				.wsc-shame-reason { font-size: 22px; color: #b71c1c; }
 			`}</style>
 			{!data.server_up ? (
 				<p className="wsc-offline">WSC server is offline.</p>
@@ -101,6 +112,27 @@ function WSCPlayersBody({ data }: WSCPlayersViewProps): ReactNode {
 								</span>
 							</li>
 						))}
+					</ul>
+				</>
+			)}
+			{(data.nat_hall_of_shame ?? []).length > 0 && (
+				<>
+					<p className="wsc-section-title">NAT Hall of Shame</p>
+					<ul className="wsc-shame-list">
+						{data.nat_hall_of_shame!.map(p => {
+							const minsLeft = Math.max(0, Math.ceil((p.blocked_until * 1000 - Date.now()) / 60000));
+							return (
+								<li className="wsc-shame-item" key={p.pid}>
+									<span className="icon-container">
+										<PortalMiiIcon pid={p.pid} type="mii-icon" />
+									</span>
+									<span>
+										<div className="wsc-shame-name">{p.mii_name || p.pnid || `PID:${p.pid}`}</div>
+										<div className="wsc-shame-reason">Failed NAT traversal — {minsLeft}m remaining</div>
+									</span>
+								</li>
+							);
+						})}
 					</ul>
 				</>
 			)}

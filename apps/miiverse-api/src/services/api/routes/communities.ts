@@ -73,6 +73,10 @@ router.get('/', async function (request: express.Request, response: express.Resp
 		limit = 4;
 	}
 
+	// WSC asks for up to 100 (its client-side maximum, fn_02891A2C in wsc.rpx), but
+	// each community embeds a ~11 KB icon: 100 of them is a ~930 KB response, which
+	// WSC appears unable to handle (club lookup then fails with 115-9999). 16 is
+	// ~190 KB and known to work. Raise in small steps and re-test if more are needed.
 	if (limit > 16) {
 		limit = 16;
 	}
@@ -87,7 +91,12 @@ router.get('/', async function (request: express.Request, response: express.Resp
 		query.user_favorites = request.pid;
 	}
 
-	const communities = await Community.find(query).limit(limit);
+	// Communities with app_data set come first: WSC matches its club code against
+	// app_data locally (before StartPortalApp) using only the communities it
+	// gets back, so a club with app_data must not be cut off by the limit or "Open
+	// Miiverse" fails with 115-9999. Empty app_data sorts lowest, so descending
+	// puts the identified clubs ahead; _id keeps the order stable otherwise.
+	const communities = await Community.find(query).sort({ app_data: -1, _id: 1 }).limit(limit);
 
 	const result: CommunitiesResult = {
 		has_error: 0,
