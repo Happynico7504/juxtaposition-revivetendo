@@ -74,12 +74,13 @@ router.get('/', async function (request: express.Request, response: express.Resp
 		limit = 4;
 	}
 
-	// WSC asks for up to 100 (its client-side maximum, fn_02891A2C in wsc.rpx), but
-	// each community embeds a ~11 KB icon: 100 of them is a ~930 KB response, which
-	// WSC appears unable to handle (club lookup then fails with 115-9999). 16 is
-	// ~190 KB and known to work. Raise in small steps and re-test if more are needed.
-	if (limit > 16) {
-		limit = 16;
+	// Upstream capped this at 16 with no recorded reason (the code predates this repo).
+	// We tried 16 because a 100-community answer (~930 KB with the ~11 KB icon each) seemed
+	// to break WSC's club lookup, but that was never isolated from an unrelated app_data
+	// encoding bug, and the migration to many regional clubs made the cap a suspect for the
+	// thoughts/banters lists staying empty. Now only bounded by WSC's own client maximum (100).
+	if (limit > 100) {
+		limit = 100;
 	}
 
 	const query: SubCommunityQuery = {

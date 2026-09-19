@@ -207,12 +207,25 @@ router.get('/', async function (request: express.Request, response: express.Resp
 	const reportedFor = (post: HydratedPostDocument): HydratedCommunityDocument | undefined =>
 		sharedBanter && regionalBanter && post.community_id === sharedBanter.olive_community_id ? regionalBanter : undefined;
 
-	const postJson = posts.map(post =>
+	const postJson = posts.map((post) => {
 		// Include topic_tag and app_data like the community post lists do: WSC fetches its
 		// online banters by post ID before a match and needs the tag (which sport/category
 		// a banter is for) to show it.
-		post.json({ with_mii: true, app_data: true, topic_tag: true }, reportedFor(post))
-	);
+		const reported = reportedFor(post);
+		const json = post.json({ with_mii: true, app_data: true, topic_tag: true }, reported);
+		if (reported) {
+			// A shared banter carries its POSTER's title ID (a US player's banter says US, in
+			// the post and in its topic tag). The real service kept one community tree per
+			// region, so a console only ever saw posts labelled with its own title; label the
+			// shared banter with the requester's title ID, like its community above.
+			const ownTitleID = request.paramPack.title_id;
+			json.title_id = ownTitleID;
+			if (json.topic_tag) {
+				json.topic_tag = { ...json.topic_tag, title_id: ownTitleID };
+			}
+		}
+		return json;
+	});
 
 	response.send(xmlbuilder.create({
 		result: {
@@ -224,10 +237,11 @@ router.get('/', async function (request: express.Request, response: express.Resp
 			topic: {
 				community_id: reportedFor(posts[0])?.community_id ?? posts[0].community_id
 			},
-			// One post stays a plain object (unchanged output); several become repeated <post> elements.
-			posts: {
-				post: postJson.length === 1 ? postJson[0] : postJson
-			}
+			// [{ post }, { post }] is what makes xmlbuilder emit ONE <posts> holding one <post>
+			// per item, same as the community post lists. `posts: { post: [a, b] }` looked
+			// equivalent but merged every item's fields into a single <post>, which nn::olv
+			// rejects as 115-2004 (XmlParseError) as soon as a request asked for 2+ posts.
+			posts: postJson.map(post => ({ post }))
 		}
 	}, {
 		separateArrayItems: true
