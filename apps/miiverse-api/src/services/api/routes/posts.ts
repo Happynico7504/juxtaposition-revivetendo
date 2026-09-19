@@ -15,6 +15,9 @@ import {
 	getUserSettings,
 	getCommunityByID,
 	getCommunityByTitleID,
+	getCommunityByTitleIDPreferBanter,
+	getRegionalBanterCommunity,
+	getSharedBanterCommunity,
 	getDuplicatePosts
 } from '@/database';
 import { Post } from '@/models/post';
@@ -174,28 +177,60 @@ router.get('/:post_id/replies', async function (request: express.Request, respon
 router.get('/', async function (request: express.Request, response: express.Response): Promise<void> {
 	response.type('application/xml');
 
-	const postID = getValueFromQueryString(request.query, 'post_id')[0];
+	// nn::olv's DownloadPostDataList sends one post_id per post it wants
+	// (DownloadPostDataListParam::SetPostId(id, index)), so a request can carry several:
+	// ?post_id=A&post_id=B. Answer with every one that exists, in the order asked.
+	const postIDs = getValueFromQueryString(request.query, 'post_id').slice(0, 100);
 
-	if (!postID) {
+	if (postIDs.length === 0) {
 		request.log.warn('Post ID wasn\'t provided');
 		return badRequest(response, ApiErrorCode.BAD_PARAMS);
 	}
 
-	const post = await getPostByID(postID);
+	const posts: HydratedPostDocument[] = [];
+	for (const postID of postIDs) {
+		const post = await getPostByID(postID);
+		if (post) {
+			posts.push(post);
+		}
+	}
 
-	if (!post) {
+	if (posts.length === 0) {
 		return badRequest(response, ApiErrorCode.FAIL_NOT_FOUND_POST, 404);
 	}
+
+	// Banters are stored in ONE shared community, but a console only knows the banter
+	// community its own region's list advertised. Report that regional community as the
+	// post's community so the game recognises the banter as belonging to it.
+	const sharedBanter = await getSharedBanterCommunity();
+	const regionalBanter = sharedBanter ? await getRegionalBanterCommunity(request.paramPack.title_id) : null;
+	const reportedFor = (post: HydratedPostDocument): HydratedCommunityDocument | undefined =>
+		sharedBanter && regionalBanter && post.community_id === sharedBanter.olive_community_id ? regionalBanter : undefined;
+
+	const postJson = posts.map(post =>
+		// Include topic_tag and app_data like the community post lists do: WSC fetches its
+		// online banters by post ID before a match and needs the tag (which sport/category
+		// a banter is for) to show it.
+		post.json({ with_mii: true, app_data: true, topic_tag: true }, reportedFor(post))
+	);
 
 	response.send(xmlbuilder.create({
 		result: {
 			has_error: '0',
 			version: '1',
 			request_name: 'posts.search',
+			// The community post lists carry a <topic> element that nn::olv's
+			// DownloadPostDataList reads into its topic record; the by-ID lookup had none.
+			topic: {
+				community_id: reportedFor(posts[0])?.community_id ?? posts[0].community_id
+			},
+			// One post stays a plain object (unchanged output); several become repeated <post> elements.
 			posts: {
-				post: post.json({ with_mii: true })
+				post: postJson.length === 1 ? postJson[0] : postJson
 			}
 		}
+	}, {
+		separateArrayItems: true
 	}).end({ pretty: true, allowEmpty: true }));
 });
 
@@ -296,7 +331,14 @@ async function newPost(request: express.Request, response: express.Response): Pr
 	}
 
 	if (!community) {
-		community = await getCommunityByTitleID(request.paramPack.title_id);
+		// Same "resolve it for me" case as the GET .../posts route - a post must land in
+		// the community that route reads from, or it is invisible to every later read.
+		// Posts with a search_key are thoughts (region's top-level community); posts
+		// without one are typed custom callouts (shared Online Banter community).
+		const hasSearchKey = Array.isArray(searchKey) ? searchKey.length > 0 : searchKey !== '';
+		community = hasSearchKey
+			? await getCommunityByTitleID(request.paramPack.title_id)
+			: await getCommunityByTitleIDPreferBanter(request.paramPack.title_id);
 	}
 
 	let parentPost: HydratedPostDocument | null = null;

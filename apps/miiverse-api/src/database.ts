@@ -64,6 +64,63 @@ export async function getCommunityByTitleID(titleID: string): Promise<HydratedCo
 	});
 }
 
+// Resolves a title_id to the shared "Online Banter Community" - the community WSC's
+// thought posts live in - for the callers (GET /:communityID/posts and newPost) that
+// receive community_id=0 with a search_key, which the real client means as "resolve
+// it for me", not "give me the main community".
+//
+// The original service had a separate "Online Banter Community" (US) / "Custom
+// Callout Community" (EU, JP) per region. We deliberately share ONE across all
+// regions instead: any title_id that has such a community resolves to the same
+// "Online Banter Community", so players from every region read and write the same
+// thoughts. The regional Custom Callout communities stay in place (they are still
+// listed under their region's main community) but no longer receive posts.
+//
+// Every sub-community under a region shares its main community's title_id array, so
+// a plain findOne by title_id just returns whichever the database happens to return
+// first (in practice the main community) - hence the explicit name match. Falls back
+// to getCommunityByTitleID for any title_id without a banter/callout community.
+const SHARED_BANTER_NAME = 'Online Banter Community';
+const REGIONAL_BANTER_NAMES = [SHARED_BANTER_NAME, 'Custom Callout Community'];
+
+export async function getCommunityByTitleIDPreferBanter(titleID: string): Promise<HydratedCommunityDocument | null> {
+	verifyConnected();
+
+	const regional = await Community.findOne({
+		title_id: titleID,
+		name: { $in: REGIONAL_BANTER_NAMES }
+	});
+
+	if (regional) {
+		// Oldest one wins so the choice is stable if a second ever gets created.
+		const shared = await Community.findOne({ name: SHARED_BANTER_NAME }).sort({ _id: 1 });
+		return shared ?? regional;
+	}
+
+	return getCommunityByTitleID(titleID);
+}
+
+// The single community all regions store banters in (oldest "Online Banter Community").
+export async function getSharedBanterCommunity(): Promise<HydratedCommunityDocument | null> {
+	verifyConnected();
+
+	return Community.findOne({ name: SHARED_BANTER_NAME }).sort({ _id: 1 });
+}
+
+// The requester's own region's banter/callout community (US "Online Banter Community",
+// EU/JP "Custom Callout Community") - the one their community list advertises with the
+// "comment" app_data - or null if their title has none. Banter posts are STORED in the
+// single shared Online Banter community, but each console only knows the community ID it
+// got from its own region's list, so responses report that regional ID (see posts.search).
+export async function getRegionalBanterCommunity(titleID: string): Promise<HydratedCommunityDocument | null> {
+	verifyConnected();
+
+	return Community.findOne({
+		title_id: titleID,
+		name: { $in: REGIONAL_BANTER_NAMES }
+	});
+}
+
 export async function getCommunityByTitleIDs(titleIDs: string[]): Promise<HydratedCommunityDocument | null> {
 	verifyConnected();
 

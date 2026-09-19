@@ -89,6 +89,10 @@ export async function getUserDataFromServiceToken(token: string): Promise<GetPNI
 		return userData.pnid;
 	} catch (e) {
 		logger.error(e, 'Failed to extract PID from service token');
+		// Shape only (never the token itself): helps tell truncated, wrong-format and
+		// stale tokens apart when a console keeps sending one the account service rejects.
+		const raw = Buffer.from(token, 'base64');
+		logger.error({ tokenChars: token.length, decodedBytes: raw.length, decodedMod16: raw.length % 16 }, 'Rejected service token shape');
 		return null;
 	}
 }

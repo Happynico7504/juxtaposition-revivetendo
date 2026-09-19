@@ -9,6 +9,7 @@ import {
 	getMostPopularCommunities,
 	getNewCommunities,
 	getCommunityByTitleID,
+	getCommunityByTitleIDPreferBanter,
 	getUserContent
 } from '@/database';
 import { ApiErrorCode, badRequest, serverError } from '@/errors';
@@ -143,7 +144,14 @@ router.get('/:communityID/posts', async function (request: express.Request, resp
 	});
 
 	if (!community) {
-		community = await getCommunityByTitleID(request.paramPack.title_id);
+		// community_id "0" (or any ID that doesn't exist) means "resolve this for me".
+		// Thoughts (posts carrying a search_key, e.g. sp_001_type_01_000) live in the
+		// region's top-level community; typed custom callouts (no search_key) live in
+		// the shared Online Banter community. The write path splits the same way.
+		const requestedSearchKey = getValueFromQueryString(request.query, 'search_key')[0];
+		community = requestedSearchKey
+			? await getCommunityByTitleID(request.paramPack.title_id)
+			: await getCommunityByTitleIDPreferBanter(request.paramPack.title_id);
 	}
 
 	if (!community) {

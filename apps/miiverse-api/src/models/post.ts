@@ -227,7 +227,12 @@ PostSchema.method<HydratedPostDocument>('json', function json(options: PostToJSO
 		body: this.cleanedBody(),
 		community_id: this.community_id, // TODO - This sucks
 		country_id: this.country_id,
-		created_at: moment(this.created_at).format('YYYY-MM-DD HH:MM:SS'),
+		// Miiverse timestamps are UTC "YYYY-MM-DD HH:mm:ss". This used to be
+		// moment(...).format('YYYY-MM-DD HH:MM:SS') - server-local time (UTC+2 here) with the
+		// month in the minutes slot and fractional seconds in the seconds slot - which made every
+		// post look ~2 hours newer than it is, so WSC's "usable after an hour" rule kept online
+		// banters unusable for about 3 hours instead of 1.
+		created_at: moment.utc(this.created_at).format('YYYY-MM-DD HH:mm:ss'),
 		feeling_id: this.feeling_id ?? 0,
 		id: this.id,
 		is_autopost: this.is_autopost ? 1 : 0,
