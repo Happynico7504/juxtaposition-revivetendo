@@ -1,8 +1,20 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { CtrPageBody, CtrRoot } from '@/services/juxt-web/views/ctr/root';
+import { distFolder } from '@/util';
 import { T } from '@/services/juxt-web/views/common/components/T';
 import { CtrPageTitledHeader } from '@/services/juxt-web/views/ctr/components/CtrPageHeader';
 import type { ReactNode } from 'react';
 import type { FirstRunViewProps } from '@/services/juxt-web/views/web/firstRunView';
+
+// Inlined like juxt.global.js in root.tsx: the 3DS often fails the extra TLS
+// handshakes for separate files, and without this script the last step's
+// submitFirstRun() doesn't exist - 3DS-only players could never finish setup
+// (auth_onboarding_incomplete, 2026-10-07). Read once at startup.
+const firstRunJs = fs.readFileSync(path.join(distFolder, 'webfiles', 'ctr', 'js', 'firstrun.global.js'), 'utf-8')
+	.replaceAll('</script', '<\\/script');
+const firstRunCss = fs.readFileSync(path.join(distFolder, 'webfiles', 'ctr', 'css', 'firstrun.css'), 'utf-8')
+	.replaceAll('</style', '<\\/style');
 
 const AboutSection = {
 	Root(props: { children?: ReactNode; id?: string; visible?: boolean }): ReactNode {
@@ -70,8 +82,8 @@ export function CtrFirstRunView(_props: FirstRunViewProps): ReactNode {
 
 	const head = (
 		<>
-			<link rel="stylesheet" type="text/css" href="/assets/ctr/css/firstrun.css" />
-			<script src="/assets/ctr/js/firstrun.global.js"></script>
+			<style dangerouslySetInnerHTML={{ __html: firstRunCss }} />
+			<script dangerouslySetInnerHTML={{ __html: firstRunJs }} />
 		</>
 	);
 
