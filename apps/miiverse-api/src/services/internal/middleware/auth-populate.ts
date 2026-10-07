@@ -33,13 +33,13 @@ export async function authPopulate(request: express.Request, response: express.R
 		let content = await getUserContent(pnid.pid);
 
 		// Web (password) logins are already gated on having a real, previously-registered
-		// Wii U device - account-proxy's handleInternalAuth requires a wii_devices row
-		// (populated only by an actual console connecting once) before it will issue a
-		// token at all, for both the real-Pretendo-password path and the web_password_hash
-		// bypass path. So a web login reaching this point already proves prior Wii U
+		// console - account-proxy's handleInternalAuth requires stored console credentials
+		// (a wii_devices row for a Wii U or an n3ds_devices row for a 3DS, populated only by
+		// an actual console connecting once) plus a web password before it will issue a
+		// token at all. So a web login reaching this point already proves prior console
 		// ownership, same as it would for a console - the normal way these documents get
 		// created (a console's first-run flow) just isn't reachable for a user who's
-		// banned from Pretendo (and so can't get their Wii U through NASC), even though
+		// banned from Pretendo (and so can't get their console through NASC), even though
 		// they're otherwise a legitimate user. Console logins (x-service-token) don't get
 		// this treatment: they still have their normal first-run flow available, and we
 		// don't want to guess at defaults on their behalf.

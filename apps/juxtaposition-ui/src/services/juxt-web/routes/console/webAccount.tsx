@@ -2,6 +2,7 @@ import express from 'express';
 import { z } from 'zod';
 import { parseReq } from '@/services/juxt-web/routes/routeUtils';
 import { PortalWebAccountView } from '@/services/juxt-web/views/portal/webAccountView';
+import { CtrWebAccountView } from '@/services/juxt-web/views/ctr/webAccountView';
 import type { WebLoginEntry } from '@/services/juxt-web/views/portal/webAccountView';
 import { zodFallback } from '@/util';
 
@@ -33,9 +34,10 @@ webAccountRouter.get('/', async function (req, res) {
 		}
 	} catch { /* account-proxy unreachable */ }
 
-	return res.jsx(
-		<PortalWebAccountView hasPassword={hasPassword} logins={logins} msg={query.msg} />
-	);
+	return res.jsxForDirectory({
+		portal: <PortalWebAccountView hasPassword={hasPassword} logins={logins} msg={query.msg} />,
+		ctr: <CtrWebAccountView hasPassword={hasPassword} logins={logins} msg={query.msg} />
+	});
 });
 
 webAccountRouter.post('/set-password', async function (req, res) {

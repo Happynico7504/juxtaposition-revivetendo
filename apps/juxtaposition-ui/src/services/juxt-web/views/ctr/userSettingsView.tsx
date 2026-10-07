@@ -47,6 +47,11 @@ export function CtrUserSettingsView(props: UserSettingsViewProps): ReactNode {
 										<span className="checkmark"></span>
 									</label>
 								</li>
+								<li data-name="web_access" className="scroll">
+									<a href="/web-account">
+										<p className="settings-label">Web Access</p>
+									</a>
+								</li>
 								<input id="submit" type="submit" className="post-button fixed-bottom-button" value={T.str('global.save')} />
 							</ul>
 						</form>
