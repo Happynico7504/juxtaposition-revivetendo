@@ -16,6 +16,9 @@ export type WSCGathering = {
 	player_count: number;
 	max_players: number;
 	open: boolean;
+	kind?: 'friend' | 'club' | 'public';
+	kind_label?: string;
+	club_name?: string;
 	players: WSCPlayer[];
 };
 
@@ -57,6 +60,10 @@ function WSCPlayersBody({ data }: WSCPlayersViewProps): ReactNode {
 				.wsc-offline { color: #999; font-size: 26px; padding: 32px 8px; text-align: center; }
 				.wsc-open-badge { font-size: 20px; background: #4caf50; color: #fff; border-radius: 6px; padding: 2px 10px; }
 				.wsc-closed-badge { font-size: 20px; background: #e53935; color: #fff; border-radius: 6px; padding: 2px 10px; }
+				.wsc-kind-badge { font-size: 20px; color: #fff; border-radius: 6px; padding: 2px 10px; margin-left: 10px; vertical-align: middle; background: #607d8b; }
+				.wsc-kind-friend { background: #8e44ad; }
+				.wsc-kind-club { background: #f39c12; }
+				.wsc-club-name { font-size: 20px; color: #888; margin-left: 8px; }
 				.wsc-shame-list { list-style: none; margin: 0; padding: 0; }
 				.wsc-shame-item { display: flex; align-items: center; padding: 12px 8px; border-bottom: 1px solid #f0f0f0; }
 				.wsc-shame-item .icon-container { margin-right: 16px; flex-shrink: 0; }
@@ -76,7 +83,11 @@ function WSCPlayersBody({ data }: WSCPlayersViewProps): ReactNode {
 							{data.gatherings.map(g => (
 								<div className="wsc-gathering" key={g.gid}>
 									<div className="wsc-gathering-header">
-										<span className="wsc-gathering-sport">{g.sport_name}</span>
+										<span className="wsc-gathering-sport">
+											{g.sport_name}
+											<span className={`wsc-kind-badge wsc-kind-${g.kind ?? 'public'}`}>{g.kind_label ?? 'Public'}</span>
+											{g.club_name && <span className="wsc-club-name">{g.club_name}</span>}
+										</span>
 										<span>
 											<span className="wsc-gathering-count">{g.player_count}/{g.max_players} </span>
 											{g.open
