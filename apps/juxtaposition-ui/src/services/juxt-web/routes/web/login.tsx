@@ -37,6 +37,12 @@ loginRouter.post('/', async (req, res) => {
 				res.jsx(<WebLoginView toast="Password was incorrect." redirect={redirect} />);
 				break;
 			default:
+				// Revivetendo: account-proxy locks an account's web login after 3 wrong passwords,
+				// explains where to set a web password, and says when a PNID never connected.
+				if (typeof e.details === 'string' && ['Too many wrong passwords', 'No web password', 'This PNID is not on Revivetendo', 'PNIDs are case-sensitive'].some(p => e.details.startsWith(p))) {
+					res.jsx(<WebLoginView toast={e.details} redirect={redirect} />);
+					break;
+				}
 				logger.error(e, `Login error for ${username}`);
 				res.jsx(<WebLoginView toast="Invalid username or password." redirect={redirect} />);
 				break;
