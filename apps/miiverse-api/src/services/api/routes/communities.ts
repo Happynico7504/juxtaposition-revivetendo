@@ -10,6 +10,7 @@ import {
 	getNewCommunities,
 	getCommunityByTitleID,
 	getCommunityByTitleIDPreferBanter,
+	subCommunityParentID,
 	getUserContent
 } from '@/database';
 import { ApiErrorCode, badRequest, serverError } from '@/errors';
@@ -37,7 +38,7 @@ async function commonGetSubCommunity(paramPack: ParamPack, communityID: string |
 	}
 
 	const query = {
-		parent: parentCommunity.olive_community_id,
+		parent: subCommunityParentID(paramPack.title_id, parentCommunity),
 		community_id: communityID
 	};
 
@@ -84,7 +85,7 @@ router.get('/', async function (request: express.Request, response: express.Resp
 	}
 
 	const query: SubCommunityQuery = {
-		parent: parentCommunity.olive_community_id
+		parent: subCommunityParentID(request.paramPack.title_id, parentCommunity)
 	};
 
 	if (type === 'my') {

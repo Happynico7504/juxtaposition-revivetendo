@@ -59,9 +59,28 @@ export async function getSubCommunities(parentCommunityID: string): Promise<Hydr
 export async function getCommunityByTitleID(titleID: string): Promise<HydratedCommunityDocument | null> {
 	verifyConnected();
 
-	return Community.findOne({
+	// Sub-communities can carry their main community's title IDs (WSC clubs do),
+	// so the top-level community wins.
+	return await Community.findOne({ title_id: titleID, parent: null }) ?? Community.findOne({
 		title_id: titleID
 	});
+}
+
+// The three regional Wii Sports Club main communities were merged into one
+// international community (the US one, 2026-10-08), but each region's clubs stay
+// under their old regional parent: EU and US club codes overlap (EU 033 = GER
+// Hesse, US 033 = North Carolina) and WSC matches the player's club code against
+// the club list it downloads, so a console must only get its own region's clubs.
+const WSC_CLUB_PARENTS: { parent: string; titleIDs: string[] }[] = [
+	{ parent: '14866558073079465304', titleIDs: ['1407375153319168', '1407375153318912', '1407375153685760', '1407375153686016', '1407375153686272'] }, // US
+	{ parent: '14866558073079666960', titleIDs: ['1407375153319424', '1407375153685761', '1407375153686017', '1407375153686273'] }, // EU
+	{ parent: '14866558073078154134', titleIDs: ['1407375153230080', '1407375153230081', '1407375153230082', '1407375153685762', '1407375153686018', '1407375153686274'] } // JP
+];
+
+// subCommunityParentID is the parent whose sub-communities a title sees: its main
+// community, or for Wii Sports Club its region's club tree.
+export function subCommunityParentID(titleID: string, parentCommunity: HydratedCommunityDocument): string {
+	return WSC_CLUB_PARENTS.find(r => r.titleIDs.includes(titleID))?.parent ?? parentCommunity.olive_community_id;
 }
 
 // Resolves a title_id to the shared "Online Banter Community" - the community WSC's
