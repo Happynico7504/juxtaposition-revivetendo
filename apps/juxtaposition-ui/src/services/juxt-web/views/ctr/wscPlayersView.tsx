@@ -102,11 +102,11 @@ export function CtrWSCPlayersView({ data }: WSCPlayersViewProps): ReactNode {
 												</li>
 											))}
 										</ul>
-										{(data.nat_hall_of_shame ?? []).length > 0 && (
+										{(data.connection_hall_of_shame ?? []).length > 0 && (
 											<>
-												<p className="wsc-section-title">NAT Hall of Shame</p>
+												<p className="wsc-section-title">Connection Hall of Shame</p>
 												<ul className="wsc-shame-list">
-													{data.nat_hall_of_shame!.map(p => {
+													{data.connection_hall_of_shame!.map(p => {
 														const minsLeft = Math.max(0, Math.ceil((p.blocked_until * 1000 - Date.now()) / 60000));
 														return (
 															<li className="wsc-shame-item" key={p.pid}>
@@ -116,7 +116,9 @@ export function CtrWSCPlayersView({ data }: WSCPlayersViewProps): ReactNode {
 																<span>
 																	<div className="wsc-shame-name">{p.mii_name || p.pnid || `PID:${p.pid}`}</div>
 																	<div className="wsc-shame-reason">
-																		Failed NAT traversal —
+																		{p.reason}
+																		{' '}
+																		—
 																		{' '}
 																		{minsLeft}
 																		m remaining
