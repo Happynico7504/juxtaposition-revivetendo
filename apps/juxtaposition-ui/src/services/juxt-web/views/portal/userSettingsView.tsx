@@ -42,6 +42,14 @@ export function PortalUserSettingsView(props: UserSettingsViewProps): ReactNode 
 										<span className="checkmark"></span>
 									</label>
 								</li>
+								<li data-name="larimar" className="scroll">
+									<p className="settings-label">Use Larimar Miiverse (unfinished - most pages are still empty) - takes effect the next time you open Miiverse. You can switch back in Larimar's settings.</p>
+									<input type="hidden" name="instance_choice" value="1" />
+									<label className="checkbox-container">
+										<input type="checkbox" id="larimar" name="larimar" value="true" checked={!!props.useLarimar} />
+										<span className="checkmark"></span>
+									</label>
+								</li>
 								<li>
 									<a href="/web-account">Web Access</a>
 								</li>

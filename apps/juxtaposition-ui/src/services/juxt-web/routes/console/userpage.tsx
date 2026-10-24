@@ -17,6 +17,7 @@ import { CtrUserSettingsView } from '@/services/juxt-web/views/ctr/userSettingsV
 import { PortalUserMissingPage, PortalUserPageView } from '@/services/juxt-web/views/portal/userPageView';
 import { CtrUserMissingPage, CtrUserPageView } from '@/services/juxt-web/views/ctr/userPageView';
 import { wrapApi } from '@/api/errors';
+import { redisGet, redisRemove, redisSet } from '@/redisCache';
 import type { Request, Response } from 'express';
 import type { UserPageFollowingViewProps } from '@/services/juxt-web/views/web/userPageFollowingView';
 import type { PostListViewProps } from '@/services/juxt-web/views/web/postList';
@@ -27,6 +28,10 @@ export const userPageRouter = express.Router();
 const upload = multer({ dest: 'uploads/' });
 
 const pidParamSchema = z.union([z.literal('me'), z.coerce.number()]);
+
+// Read by miiverse-api's discovery (src/larimar.ts) and deleted by Larimar's
+// own settings page to switch back. No key means Juxt.
+const larimarInstanceKey = (pid: number): string => `miiverse:instance:${pid}`;
 
 userPageRouter.get('/menu', async function (req, res) {
 	res.jsx(<CtrUserMenuView />);
@@ -88,7 +93,8 @@ userPageRouter.get('/me/settings', async function (req, res) {
 	}
 
 	const props: UserSettingsViewProps = {
-		userSettings
+		userSettings,
+		useLarimar: await redisGet(larimarInstanceKey(auth().pid)) === 'larimar'
 	};
 	res.jsxForDirectory({
 		portal: <PortalUserSettingsView {...props} />,
@@ -112,7 +118,10 @@ userPageRouter.post('/me/settings', upload.none(), async function (req, res) {
 			country: z.coerce.boolean(),
 			birthday: z.coerce.boolean(),
 			experience: z.coerce.boolean(),
-			comment: z.string().optional()
+			comment: z.string().optional(),
+			// Only the Wii U settings form has the Larimar option
+			instance_choice: z.string().optional(),
+			larimar: z.coerce.boolean()
 		})
 	});
 	const userSettings = await database.getUserSettings(auth().pid);
@@ -126,6 +135,14 @@ userPageRouter.post('/me/settings', upload.none(), async function (req, res) {
 	userSettings.game_skill_visibility = body.experience;
 	userSettings.profile_comment_visibility = !!body.comment;
 	await userSettings.updateComment(body.comment ?? '');
+
+	if (body.instance_choice) {
+		if (body.larimar) {
+			await redisSet(larimarInstanceKey(auth().pid), 'larimar');
+		} else {
+			await redisRemove(larimarInstanceKey(auth().pid));
+		}
+	}
 
 	res.redirect('/users/me');
 });

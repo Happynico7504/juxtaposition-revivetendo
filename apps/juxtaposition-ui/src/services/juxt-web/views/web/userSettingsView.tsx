@@ -4,4 +4,6 @@ import type { HydratedSettingsDocument } from '@/models/settings';
 
 export type UserSettingsViewProps = {
 	userSettings: HydratedSettingsDocument;
+	// Wii U portal only: whether Miiverse opens Larimar instead of Juxt
+	useLarimar?: boolean;
 };

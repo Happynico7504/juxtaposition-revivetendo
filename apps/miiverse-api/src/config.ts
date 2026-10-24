@@ -54,6 +54,12 @@ const schema = z.object({
 	domains: z.object({
 		api: z.hostname().default('api.olv.pretendo.cc'),
 		discovery: z.hostname().default('discovery.olv.pretendo.cc')
+	}).prefault({}),
+	// Larimar, the secondary Miiverse (see src/larimar.ts)
+	larimar: z.object({
+		portalHost: z.hostname().default('portal.larimar.nicochristmann.net'),
+		healthUrl: z.string().url().default('http://127.0.0.1:8082/health'),
+		redisUrl: z.string().default('redis://localhost:6379')
 	}).prefault({})
 });
 

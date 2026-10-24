@@ -2,6 +2,7 @@ import express from 'express';
 import xmlbuilder from 'xmlbuilder';
 import { getEndpoint } from '@/database';
 import { ApiErrorCode, badRequest, serverError } from '@/errors';
+import { larimarPortalHostFor } from '@/larimar';
 import type { HydratedEndpointDocument } from '@/models/endpoint';
 
 const router = express.Router();
@@ -30,6 +31,10 @@ router.get('/', async function (request: express.Request, response: express.Resp
 		return serverError(response, ApiErrorCode.NO_DISCOVERY_DATA);
 	}
 
+	// Only the portal moves to Larimar: in-game posting, Wii Sports Club,
+	// Badge Arcade and Wara Wara Plaza stay on Juxt's api_host.
+	const larimarPortalHost = request.user ? await larimarPortalHostFor(request.user.pid, request.paramPack) : null;
+
 	response.send(xmlbuilder.create({
 		result: {
 			has_error: 0,
@@ -37,7 +42,7 @@ router.get('/', async function (request: express.Request, response: express.Resp
 			endpoint: {
 				host: discovery.host,
 				api_host: discovery.api_host,
-				portal_host: discovery.portal_host,
+				portal_host: larimarPortalHost ?? discovery.portal_host,
 				n3ds_host: discovery.n3ds_host
 			}
 		}
