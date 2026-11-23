@@ -56,7 +56,12 @@ export function WebNavBar(props: NavBarProps): ReactNode {
 								: null}
 						</>
 					)
-				: null}
+				: (
+						<a href="/login">
+							<WebUIIcon name="right-arrow" />
+							<p><T k="login.login_action" /></p>
+						</a>
+					)}
 		</header>
 	);
 }
