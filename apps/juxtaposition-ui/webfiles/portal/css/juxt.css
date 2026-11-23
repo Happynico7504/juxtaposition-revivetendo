@@ -888,7 +888,7 @@ h6.yeah-text {
  position:relative;
  min-height:110px;
  box-shadow:inset 0-3px 3px rgba(0,0,0,.2);
- background:#930193 url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="100" fill="%23861e86"><linearGradient id="a" x1="0" x2="311.769" y1="0" y2="0" gradientTransform="scale(3.99464 .33289)" gradientUnits="userSpaceOnUse"><stop offset=".2" stop-color="%23930193"/><stop offset="1" stop-color="%23930193" stop-opacity="-2"/></linearGradient><g stroke-width="0" transform="translate(0 15.405)scale(1.15315)"><rect width="60" height="60" x="1050" y="30" rx="5"/><rect width="60" height="60" x="210" y="30" rx="5"/><rect width="60" height="60" x="270" y="-30" rx="5"/><rect width="60" height="60" x="330" y="30" rx="5"/><rect width="60" height="60" x="390" y="-30" rx="5"/><rect width="60" height="60" x="450" y="30" rx="5"/><rect width="60" height="60" x="510" y="-30" rx="5"/><rect width="60" height="60" x="570" y="30" rx="5"/><rect width="60" height="60" x="630" y="-30" rx="5"/><rect width="60" height="60" x="690" y="30" rx="5"/><rect width="60" height="60" x="750" y="-30" rx="5"/><rect width="60" height="60" x="810" y="30" rx="5"/><rect width="60" height="60" x="870" y="-30" rx="5"/><rect width="60" height="60" x="930" y="30" rx="5"/><rect width="60" height="60" x="990" y="-30" rx="5"/></g><path fill="url(%23a)" d="M0 0h1245.405v103.784H0z" style="fill:url(%23a);stroke-width:1.15315"/></svg>') repeat-y right top;
+ background:#930193;
 }
 #header #header-post-button {
  padding-left:75px;
