@@ -1,13 +1,13 @@
 :root {
-    --background: #1B1F3B;
-    --text: white;
-    --text-secondary: #A1A8D9;
+    --background: #3B1B3B;
+    --text: #F4E7F4;
+    --text-secondary: #D9A1D9;
     --btn: #B000B0;
-    --btn-secondary: #333960;
+    --btn-secondary: #603360;
     --theme: var(--btn);
     --theme-light: #FFAAFF;
-    --text-secondary-2: #8990C1;
-    --border: rgba(255, 255, 255, 0.1);
+    --text-secondary-2: #C189C1;
+    --border: rgba(255, 170, 255, 0.12);
 }
 
 body {
@@ -54,7 +54,7 @@ body, .main-body {
 form.account {
     display: block;
     padding: 40px 48px;
-    background-color: #292E53;
+    background-color: #532953;
     color: var(--text-secondary);
     border-radius: 12px;
     width: 360px;
@@ -80,7 +80,7 @@ form.account input {
     display: block;
     font-family: Poppins, Arial, Helvetica, sans-serif;
     font-size: 1rem;
-    background-color: #353C6A;
+    background-color: #6A356A;
     border: none;
     border-radius: 4px;
     padding: 12px;
@@ -89,7 +89,7 @@ form.account input {
 }
 
 form.account input:focus {
-    background-color: #4B5595;
+    background-color: #954B95;
     outline: none;
     transition: 150ms;
 }
@@ -111,7 +111,7 @@ form.account button {
     font-size: 1rem;
     color: var(--text);
     padding: 12px 30px;
-    background: #353C6A;
+    background: #6A356A;
     margin-top: 18px;
     cursor: pointer;
     width: 100%;

@@ -1,5 +1,5 @@
 .background {
-	background: #fff;
+	background: #3b1b3b;
 	border-radius: 20px;
 	box-shadow: 0 3px 10px rgba(0, 0, 0, 0.6);
 	margin: 40px auto;
@@ -75,9 +75,9 @@ ul.horizontal-list li > a {
 	display: inline-block;
 	width: 287px;
 	height: 60px;
-	color: #fff;
+	color: #3b1b3b;
 }
 ul.horizontal-list li.selected > a {
-	background: -webkit-gradient(linear, left top, left bottom, from(#fff), color-stop(0.3, #fff), color-stop(0.8, #fff5f5), color-stop(0.96, #fff5f5), to(#fff5f5)) 0 0;
-	color: #4d4d4d;
+	background: -webkit-gradient(linear, left top, left bottom, from(#3b1b3b), color-stop(0.3, #3b1b3b), color-stop(0.8, #401d40), color-stop(0.96, #401d40), to(#401d40)) 0 0;
+	color: #cf96cf;
 }

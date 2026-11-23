@@ -24,7 +24,7 @@ body {
 }
 
 #body {
-    background-image: url(@/images/background.png);
+    background-color: #3b1b3b;
     background-repeat: repeat;
     padding-bottom: 28px; /* Toolbar location */
 
@@ -84,7 +84,7 @@ menu.tab-header {
 
 .headline {
     line-height: 2;
-    color: #fff;
+    color: #3b1b3b;
     background: url(@/images/headline.png) 0 0 no-repeat;
     margin: 6px 10px;
     background-size: 100% !important
@@ -98,7 +98,7 @@ menu.tab-header {
 .icon-container > .icon {
     width: 64px;
     height: 64px;
-    background: #e6eaf1
+    background: #4f244f
 }
 
 .list-content-with-icon-column > li {
@@ -122,7 +122,7 @@ menu.tab-header {
 }
 
 .list-content-with-icon-column .body-content .text {
-    color: #969696;
+    color: #a94da9;
     font-size: 12px;
     position: relative;
     top: -5px;
@@ -135,7 +135,7 @@ menu.tab-header {
 
 .community-name.title {
     font-size: 15px;
-    color: #323232
+    color: #dcb2dc
 }
 
 .text {
@@ -182,8 +182,8 @@ menu.tab-header a {
 
 menu.tab-header li.selected a {
     display: inline-block;
-    background: -webkit-gradient(linear, left top, left bottom, from(#fff), color-stop(.3, #fff), color-stop(.8, #fff5f5), color-stop(.96, #fff5f5), to(#fff5f5)) 0 0;
-    color: #4d4d4d
+    background: -webkit-gradient(linear, left top, left bottom, from(#3b1b3b), color-stop(.3, #3b1b3b), color-stop(.8, #401d40), color-stop(.96, #401d40), to(#401d40)) 0 0;
+    color: #cf96cf
 }
 
 menu.tab-header.user-page a,
@@ -212,7 +212,7 @@ menu.tab-header.user-page li:last-child {
 .mii-icon-container img {
     width: 35px;
     height: 35px;
-    background: #fff
+    background: #3b1b3b
 }
 
 .mii-icon-container {
@@ -225,10 +225,10 @@ menu.tab-header.user-page li:last-child {
 }
 
 .post {
-    background: #fff;
+    background: #3b1b3b;
     margin-bottom: 10px;
     border-radius: 5px;
-    border: 1px solid #666
+    border: 1px solid #c37cc3
 }
 
 .post-memo,
@@ -257,7 +257,7 @@ menu.tab-header.user-page li:last-child {
 }
 
 .post-list .post .timestamp {
-    color: #969696
+    color: #a94da9
 }
 
 .tab-body.post-list {
@@ -308,7 +308,7 @@ menu.tab-header.user-page li:last-child {
     padding: 0 5px;
     display: inline-block;
     font-size: 11px;
-    color: #969696;
+    color: #a94da9;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -330,8 +330,8 @@ menu.tab-header.user-page li:last-child {
 }
 
 .post .community-banner {
-    background-color: #e5e5e5;
-    color: #323232;
+    background-color: #562756;
+    color: #dcb2dc;
     position: relative;
     z-index: 2;
     border-radius: 2px;
@@ -359,8 +359,8 @@ menu.tab-header.user-page li:last-child {
     padding: 0;
     margin: 0 auto;
     display: block;
-    background: -webkit-gradient(linear, left top, left bottom, from(#fff), color-stop(.5, #fff), to(#e6e6e6)) 0 0;
-    border: 1px solid #cecece;
+    background: -webkit-gradient(linear, left top, left bottom, from(#3b1b3b), color-stop(.5, #3b1b3b), to(#552755)) 0 0;
+    border: 1px solid #6e326e;
     cursor: pointer
 }
 
@@ -383,7 +383,7 @@ menu.tab-header.user-page li:last-child {
 .yeah-count,
 .reply-count {
     padding-left: 5px;
-    color: #646464;
+    color: #c47ec4;
 }
 
 .to-permalink-button span {
@@ -404,7 +404,7 @@ div.button-wrapper.center {
 }
 
 #news-list-content li .body .timestamp {
-    color: #969696;
+    color: #a94da9;
     white-space: nowrap
 }
 
@@ -460,18 +460,18 @@ menu.tab-header.no-margin {
     margin-left: 0;
     font-size: 12px;
     font-weight: 400;
-    color: #969696;
+    color: #a94da9;
 }
 .body.message span {
     font-size: 10px;
-    color: #646464;
+    color: #c47ec4;
 }
 .body.message .nick-name {
     font-size: 14px;
-    color: #000;
+    color: #f4e7f4;
 }
 .body .nick-name {
-    color: #000;
+    color: #f4e7f4;
 }
 
 .settings-list > li {

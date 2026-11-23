@@ -50,7 +50,7 @@
 }
 
 .account-status-editor {
-    background: #161931;
+    background: var(--background-dark);
     border: 1px solid var(--background-alt);
     border-radius: 15px;
 
