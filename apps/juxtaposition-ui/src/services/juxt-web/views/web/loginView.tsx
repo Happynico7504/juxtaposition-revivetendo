@@ -1,5 +1,4 @@
 import { WebLoginRoot } from '@/services/juxt-web/views/web/login';
-import { PretendoLogo } from '@/services/juxt-web/views/web/components/ui/WebUIIcon';
 import { T } from '@/services/juxt-web/views/common/components/T';
 import type { ReactNode } from 'react';
 
@@ -18,8 +17,8 @@ export function WebLoginView(props: LoginViewProps): ReactNode {
 			</div>
 			<div className="wrapper">
 				<div className="account-form-wrapper">
-					<a className="logotype" href="https://pretendo.network">
-						<PretendoLogo />
+					<a className="logotype" href="https://revivetendo.nicochristmann.net">
+						<img src="/assets/web/images/revivetendo_logo.png" alt="Revivetendo" />
 					</a>
 					<form action="/login" method="post" className="account">
 						<h2><T k="login.heading" /></h2>

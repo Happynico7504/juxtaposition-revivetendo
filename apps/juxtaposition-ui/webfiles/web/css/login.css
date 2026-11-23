@@ -2,10 +2,10 @@
     --background: #1B1F3B;
     --text: white;
     --text-secondary: #A1A8D9;
-    --btn: #673DB6;
+    --btn: #B000B0;
     --btn-secondary: #333960;
     --theme: var(--btn);
-    --theme-light: #A185D6;
+    --theme-light: #FFAAFF;
     --text-secondary-2: #8990C1;
     --border: rgba(255, 255, 255, 0.1);
 }
@@ -44,12 +44,11 @@ body, .main-body {
     margin-bottom: 30px;
 }
 
-.account-form-wrapper .logotype svg {
-    width: 140px;
-}
-.account-form-wrapper .logotype svg text {
-    font-size: 20px;
-    transform: translate(593px, 495px);
+.account-form-wrapper .logotype img {
+    display: block;
+    width: 72px;
+    height: 72px;
+    border-radius: 16px;
 }
 
 form.account {
