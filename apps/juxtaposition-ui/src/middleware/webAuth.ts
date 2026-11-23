@@ -70,7 +70,7 @@ function isStartOfPath(path: string, value: string): boolean {
 function requestOkForGuest(req: Request): boolean {
 	const guestAccessPage =
 		isStartOfPath(req.path, '/users/') ||
-		(isStartOfPath(req.path, '/titles') && req.path !== '/titles/show') ||
+		isStartOfPath(req.path, '/titles') ||
 		isStartOfPath(req.path, '/communities') ||
 		isStartOfPath(req.path, '/topics') ||
 		(isStartOfPath(req.path, '/posts/') && !req.path.includes('/empathy'));

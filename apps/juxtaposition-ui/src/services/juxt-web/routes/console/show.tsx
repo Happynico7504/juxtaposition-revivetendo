@@ -18,7 +18,7 @@ showRouter.get('/', async function (req, res) {
 	});
 
 	const self = hasAuth() ? auth().self : null;
-	if (!self?.hasDoneOnboarding) {
+	if (self && !self.hasDoneOnboarding) {
 		return res.jsxForDirectory({
 			web: <WebFirstRunView />,
 			portal: <PortalFirstRunView />,
