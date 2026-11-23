@@ -24,6 +24,12 @@ export function WebLoginView(props: LoginViewProps): ReactNode {
 					<form action="/login" method="post" className="account">
 						<h2><T k="login.heading" /></h2>
 						<p><T k="login.sub_title" /></p>
+						<p className="webpw-note">
+							<T
+								k="login.web_password_note"
+								components={{ setup: <a href="https://revivetendo.nicochristmann.net/web-password.html" target="_blank" rel="noreferrer" /> }}
+							/>
+						</p>
 						<div>
 							<label htmlFor="username"><T k="login.username" /></label>
 							<input name="username" id="username" required />

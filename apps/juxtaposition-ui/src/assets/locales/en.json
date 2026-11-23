@@ -34,7 +34,8 @@
     "forgot_password": "Forgot your password?",
     "no_account": "Don't have an account?",
     "login_action": "Login",
-    "no_account_setup": "Account Creation is only available when you have a linked Wii U or 3DS."
+    "no_account_setup": "Account Creation is only available when you have a linked Wii U or 3DS.",
+    "web_password_note": "Logging in here uses a separate web password, not your Pretendo account password. <setup>Set your web password</setup> if you haven't already."
   },
   "error": {
     "title": "Error {{code}}",
