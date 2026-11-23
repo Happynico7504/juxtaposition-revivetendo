@@ -1,4 +1,11 @@
-User-agent:Twitterbot
+User-agent: Twitterbot
 Disallow:
 
 User-agent: Googlebot
+Disallow:
+
+User-agent: *
+Disallow: /login
+Disallow: /admin
+Disallow: /web-account
+Disallow: /friend_messages
