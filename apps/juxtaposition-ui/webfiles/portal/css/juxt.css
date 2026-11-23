@@ -13,6 +13,7 @@ body {
  font-size:28px;
  line-height:1.5;
  margin:0;
+ color:#f4e7f4;
  background:#3b1b3b;
  background-position-x: 25%;
  min-height:720px;
@@ -85,7 +86,7 @@ label {
 #nav-menu li {
  margin:0 15px;
  border-top:2px solid #562756;
- box-shadow:inset 0 2px 0#3b1b3b
+ box-shadow:inset 0 2px 0#f4e7f4
 }
 #nav-menu a {
  position:relative;
@@ -103,7 +104,7 @@ label {
  color:#dcb2dc;
  letter-spacing:-1px;
  text-align:center;
- text-shadow:0 2px 0#3b1b3b
+ text-shadow:0 2px 0#f4e7f4
 }
 #nav-menu #nav-menu-exit a,
 #nav-menu #nav-menu-me {
@@ -146,7 +147,7 @@ body {
  height:44px
 }
 #nav-menu #nav-menu-exit a {
- color:#3b1b3b;
+ color:#f4e7f4;
  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='74' height='72' viewBox='0 0 20 20' fill='none' stroke='url(%23grad1)' stroke-width='4' stroke-linecap='butt' stroke-linejoin='round' class='feather feather-x'%3E%3ClinearGradient id='grad1' x1='0%25' y1='0%25' x2='0%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23495167;stop-opacity:1'%3E%3C/stop%3E%3Cstop offset='100%25' style='stop-color:%23676E87;stop-opacity:1'%3E%3C/stop%3E%3C/linearGradient%3E%3Cline x1='18' y1='6' x2='6' y2='18'%3E%3C/line%3E%3Cline x1='6' y1='6' x2='18' y2='18'%3E%3C/line%3E%3C/svg%3E")38px 5px,-webkit-gradient(linear,left top,right top,from(#e3c2e3),to(#e2bfe2));
  text-shadow:0-2px 0 rgba(0,0,0,.6);
  height:47px
@@ -156,7 +157,7 @@ body {
  padding-bottom:2px;
  margin:-2px -15px;
  color:#f700f7;
- box-shadow:0 2px 0#3b1b3b,inset 0 1px 1px rgba(0,0,0,.2),inset 0-1px 1px rgba(0,0,0,.1)
+ box-shadow:0 2px 0#f4e7f4,inset 0 1px 1px rgba(0,0,0,.2),inset 0-1px 1px rgba(0,0,0,.1)
 }
 #nav-menu #nav-menu-me.selected {
  padding:0;
@@ -180,9 +181,9 @@ body {
  top:-34px;
  right:35px;
  padding:0 7px 0 5px;
- border:2px solid #3b1b3b;
+ border:2px solid #f4e7f4;
  background:-webkit-gradient(linear,left top,left bottom,from(#DB0DDB),to(#B000B0));
- color:#3b1b3b;
+ color:#f4e7f4;
  font-size:20px;
  font-weight:700;
  text-align:center;
@@ -309,7 +310,7 @@ body {
  padding:0 160px 0 20px;
  margin:0-20px 10px;
  line-height:1;
- color:#3b1b3b;
+ color:#f4e7f4;
  border-radius:10px;
  background:#930193 url("data:image/svg+xml,%3Csvg width='1080' xmlns='http://www.w3.org/2000/svg' height='60' style='background-color:%23930193;' fill='%233a1e86'%3E%3ClinearGradient xmlns='http://www.w3.org/2000/svg' gradientUnits='objectBoundingBox' y1='0' id='overlay' y2='0' x2='1' x1='0'%3E%3Cstop offset='0.2' stop-color='%23930193'/%3E%3Cstop offset='1' stop-opacity='-2' stop-color='%23930193'/%3E%3C/linearGradient%3E%3Cg xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke-width='0' id='svg_23'%3E%3Crect rx='5' id='svg_4' height='60' width='60' y='30' x='1050'/%3E%3Crect rx='5' id='svg_9' height='60' width='60' x='210' y='30'/%3E%3Crect rx='5' id='svg_10' height='60' width='60' y='-30' x='270'/%3E%3Crect rx='5' id='svg_11' height='60' width='60' y='30' x='330'/%3E%3Crect rx='5' id='svg_12' height='60' width='60' y='-30' x='390'/%3E%3Crect rx='5' id='svg_13' height='60' width='60' y='30' x='450'/%3E%3Crect rx='5' id='svg_14' height='60' width='60' y='-30' x='510'/%3E%3Crect rx='5' id='svg_15' height='60' width='60' y='30' x='570'/%3E%3Crect rx='5' id='svg_16' height='60' width='60' y='-30' x='630'/%3E%3Crect rx='5' id='svg_17' height='60' width='60' y='30' x='690'/%3E%3Crect rx='5' id='svg_18' height='60' width='60' y='-30' x='750'/%3E%3Crect rx='5' id='svg_19' height='60' width='60' y='30' x='810'/%3E%3Crect rx='5' id='svg_20' height='60' width='60' y='-30' x='870'/%3E%3Crect rx='5' id='svg_21' height='60' width='60' y='30' x='930'/%3E%3Crect rx='5' id='svg_22' height='60' width='60' y='-30' x='990'/%3E%3C/g%3E%3C/g%3E%3Crect width='1080' height='60' fill='url(%23overlay)'/%3E%3C/svg%3E")no-repeat;
  background-position-x:right
@@ -846,7 +847,7 @@ h6.yeah-text {
 }
 #community-post-list .community-info.with-header-banner .title {
  font-size:28px;
- color:#3b1b3b;
+ color:#f4e7f4;
  line-height:28px
 }
 #community-post-list .community-info .text,
@@ -877,7 +878,7 @@ h6.yeah-text {
 }
 #community-post-list .community-info.with-header-banner .text {
  font-size:20px;
- color:#3b1b3b;
+ color:#f4e7f4;
  line-height:1.25em;
  display:inline-block;
  white-space:nowrap;
@@ -912,7 +913,7 @@ h6.yeah-text {
 #community-post-list .community-info.with-header-banner .icon-container {
  position:relative;
  z-index:2;
- border:4px solid #3b1b3b;
+ border:4px solid #f4e7f4;
  margin-left:-4px;
  margin-top:-32px;
  border-radius:14px;
@@ -1006,7 +1007,7 @@ h6.yeah-text {
  float:right;
  background:#B000B0;
  background:-webkit-gradient(linear,left top,left bottom,from(#FF20FF),color-stop(.05,#FF20FF),color-stop(1,#B000B0),to(#B000B0))0 0;
- color:#3b1b3b
+ color:#f4e7f4
 }
 .message-post-list .post .post-body {
  float:left;
@@ -1231,10 +1232,10 @@ h6.yeah-text {
 }
 .screenshot-menu>.button>input {
  height:30px;
- color:#3b1b3b
+ color:#f4e7f4
 }
 .screenshot-menu>.button {
- color:#3b1b3b
+ color:#f4e7f4
 }
 .capture-button>input {
  position:absolute;
@@ -1495,7 +1496,7 @@ textarea.placeholder {
  width:100%;
  padding:6px 0;
  line-height:1.5;
- color:#3b1b3b;
+ color:#f4e7f4;
  text-shadow:0-2px 0 rgba(0,0,0,.3);
  border-bottom-right-radius:12px;
  -webkit-border-bottom-right-radius:12px;
@@ -1566,7 +1567,7 @@ textarea.placeholder {
  top:10px;
  width:10px;
  height:20px;
- border:solid #3b1b3b;
+ border:solid #f4e7f4;
  border-width:0 6px 6px 0;
  -webkit-transform:rotate(45deg);
  -ms-transform:rotate(45deg);
@@ -1703,7 +1704,7 @@ input[type=radio] {
  color:#ff6aff
 }
 .supporter-star.dev svg {
- color:#3b1b3b;
+ color:#f4e7f4;
  fill:url(#rainbow)
 }
 .supporter-star.admin svg {

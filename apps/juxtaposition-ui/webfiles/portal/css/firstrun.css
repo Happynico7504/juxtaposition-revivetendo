@@ -75,7 +75,7 @@ ul.horizontal-list li > a {
 	display: inline-block;
 	width: 287px;
 	height: 60px;
-	color: #3b1b3b;
+	color: #f4e7f4;
 }
 ul.horizontal-list li.selected > a {
 	background: -webkit-gradient(linear, left top, left bottom, from(#3b1b3b), color-stop(0.3, #3b1b3b), color-stop(0.8, #401d40), color-stop(0.96, #401d40), to(#401d40)) 0 0;
