@@ -13,7 +13,7 @@
 	display: flex;
 }
 .button-wrapper > *:last-child, button.about-button {
-	background: #673DB6;
+	background: #B000B0;
 }
 input[type="button"], input[type="button"], button {
 	display: block;
@@ -55,7 +55,7 @@ h1 {
 	text-decoration: none;
 }
 .horizontal-list > li.selected {
-	background: #673DB6;
+	background: #B000B0;
 }
 @media screen and (max-width:730px) {
 	.horizontal-list {

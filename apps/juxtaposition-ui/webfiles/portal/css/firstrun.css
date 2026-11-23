@@ -25,12 +25,12 @@
 	font-weight: bold;
 	margin: 0 auto;
 	display: block;
-	background: -webkit-gradient(linear, left top, left bottom, from(#866dbe), to(#673DB6)) 0 0;
+	background: -webkit-gradient(linear, left top, left bottom, from(#DB0DDB), to(#B000B0)) 0 0;
 }
 .about-header {
 	font-weight: bold;
 	text-align: center;
-	color: #866dbe;
+	color: #DB0DDB;
 	font-size: 30px;
 	margin: 15px 0;
 }
@@ -43,7 +43,7 @@ h3 {
 }
 ul.horizontal-list {
 	color: white;
-	background: -webkit-gradient(linear, left top, left bottom, from(#6045af), to(#634ca8)) 0 0 !important;
+	background: -webkit-gradient(linear, left top, left bottom, from(#ab06ab), to(#a60ba6)) 0 0 !important;
 	display: block;
 	border-radius: 50px;
 	padding: 15px 15px;
@@ -53,8 +53,8 @@ ul.horizontal-list li {
 	width: 287px;
 	height: 50px;
 	cursor: pointer;
-	background-color: #5e44aa;
-	box-shadow: inset 0 7px 10px -3px rgba(66, 45, 120, 0.75), inset 0 -3px 5px 0 rgba(128, 101, 213, 0.5);
+	background-color: #a506a5;
+	box-shadow: inset 0 7px 10px -3px rgba(96,2,96, 0.75), inset 0 -3px 5px 0 rgba(247,0,247, 0.5);
 	display: table-cell;
 	text-align: center;
 }
