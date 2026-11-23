@@ -9,12 +9,12 @@ $page-gap: 10px;
     padding: 5px;
     margin-top: $page-gap;
 
-    background: -webkit-gradient(linear, left top, left bottom, from(#6045af), to(#634ca8)) 0 0;
+    background: -webkit-gradient(linear, left top, left bottom, from(#ab06ab), to(#a60ba6)) 0 0;
     border-radius: 2px;
 }
 
 .nav-tabs-row {
-    /* Evenly size our children with Not Yet Flexbox 
+    /* Evenly size our children with Not Yet Flexbox
      * https://www.w3.org/TR/2009/WD-css3-flexbox-20090723/ */
     display: -webkit-box;
 }
@@ -28,10 +28,10 @@ $page-gap: 10px;
     /* Visuals */
     text-align: center;
     background: url(@/images/tab.png);
-    color: #cabbf3;
+    color: #ff6cff;
 
     &.selected {
-        background: -webkit-gradient(linear, left top, left bottom, from(#fff), color-stop(.3, #fff), color-stop(.8, #fff5f5), color-stop(.96, #fff5f5), to(#fff5f5)) 0 0;
-        color: #4d4d4d;
+        background: -webkit-gradient(linear, left top, left bottom, from(#3b1b3b), color-stop(.3, #3b1b3b), color-stop(.8, #401d40), color-stop(.96, #401d40), to(#401d40)) 0 0;
+        color: #cf96cf;
     }
 }
