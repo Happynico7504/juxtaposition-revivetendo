@@ -142,14 +142,17 @@ window.saveUserSettings = saveUserSettings;
 // The real Miiverse resubmits a post composed while offline (the console saves up to 3
 // of these itself) through its own posting applet, "solv3" - a separate system title,
 // not a page we can serve. Each region ships its own copy; try all three known title
-// IDs (JPN/USA/EUR, confirmed USA = 0004001000008b02 via 3dbrew's title list) and jump
+// IDs (JPN/USA/EUR; low ID confirmed USA = ...008b02 via 3dbrew's title list, high ID
+// 00040030 since solv3/olv are both "System Applets" there, not "System Applications"
+// which use 00040010 - that wrong prefix is why the first version of this never found
+// solv3 on real hardware) and jump
 // to whichever exists on this console. jump_setNumberDataToApp's first argument (12) and
 // jump_toApplication's (2) are the only values ever observed for this call pair in a
 // real capture - what they actually mean isn't documented, so this is best-effort.
 var SOLV3_TITLE_IDS = [
-	'0004001000008302', // JPN
-	'0004001000008b02', // USA
-	'000400100000ba02' // EUR
+	'0004003000008302', // JPN
+	'0004003000008b02', // USA
+	'000400300000ba02' // EUR
 ];
 
 function openSavedPosts(el) {
