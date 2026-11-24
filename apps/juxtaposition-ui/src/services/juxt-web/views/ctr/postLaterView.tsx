@@ -8,7 +8,7 @@ import type { ReactNode } from 'react';
 export function CtrPostLaterView(): ReactNode {
 	const user = useUser();
 	return (
-		<>
+		<div className="add-post-page">
 			<CtrPageTitledHeader
 				data-toolbar-mode="wide"
 				data-toolbar-message={T.str('new_post.post_later')}
@@ -28,7 +28,7 @@ export function CtrPostLaterView(): ReactNode {
 					value={T.str('global.save')}
 				/>
 			</div>
-		</>
+		</div>
 	);
 }
 
