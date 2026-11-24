@@ -120,7 +120,10 @@
     "no_screenshot": "No Screenshot",
     "spoiler_label": "Spoiler",
     "painting_close": "Cancel",
-    "painting_submit": "OK"
+    "painting_submit": "OK",
+    "saved_posts": "Saved Posts",
+    "saved_posts_empty": "No saved posts",
+    "saved_posts_painting": "(painting)"
   },
   "post": {
     "title": "Post by {{username}}",
