@@ -19,6 +19,7 @@ import { zodFallback } from '@/util';
 import { CtrNewPostPage } from '@/services/juxt-web/views/ctr/newPostView';
 import { PortalNewPostPage } from '@/services/juxt-web/views/portal/newPostView';
 import { CtrSavedPostsPage } from '@/services/juxt-web/views/ctr/savedPostsView';
+import { CtrPostLaterPage } from '@/services/juxt-web/views/ctr/postLaterView';
 import { getShotMode, isPostingAllowed } from '@/services/juxt-web/routes/permissions';
 import { Community } from '@/models/communities';
 import { getAllFromList } from '@/api/helpers';
@@ -58,6 +59,12 @@ communitiesRouter.get('/all', async function (req, res) {
 		web: <WebCommunityListView {...props} />,
 		portal: <PortalCommunityListView {...props} />,
 		ctr: <CtrCommunityListView {...props} />
+	});
+});
+
+communitiesRouter.get('/post_later', async function (req, res) {
+	res.jsxForDirectory({
+		ctr: <CtrPostLaterPage />
 	});
 });
 

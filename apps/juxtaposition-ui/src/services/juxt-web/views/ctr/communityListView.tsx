@@ -66,6 +66,7 @@ export function CtrCommunityOverviewView(props: CommunityOverviewViewProps): Rea
 					<T k="global.communities" />
 				</CtrPageTitledHeader>
 				<CtrPageButtons>
+					<CtrPageButton type="left" href="/titles/post_later"><T k="new_post.post_later" /></CtrPageButton>
 					<CtrPageButton type="right" href="/titles/all"><T k="all_communities.text" /></CtrPageButton>
 				</CtrPageButtons>
 				<div className="body-content">

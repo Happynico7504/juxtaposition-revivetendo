@@ -123,7 +123,9 @@
     "painting_submit": "OK",
     "saved_posts": "Saved Posts",
     "saved_posts_empty": "No saved posts",
-    "saved_posts_painting": "(painting)"
+    "saved_posts_painting": "(painting)",
+    "post_later": "Post Later",
+    "saved_posts_limit": "You cannot save any additional posts. Please delete a previously saved post before starting a new one."
   },
   "post": {
     "title": "Post by {{username}}",

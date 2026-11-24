@@ -15,6 +15,10 @@ export type SavedPost = {
 	paint?: string;
 };
 
+// Matches the real offline composer's own EntryForm.maxLocalStorageNum - both it and
+// "Post Later" share the same cave.lls_* pool, so the cap has to match.
+export var MAX_SAVED_POSTS = 3;
+
 function isSavedPostKey(key: string): boolean {
 	return /^[0-9]+$/.test(key);
 }

@@ -2,6 +2,7 @@ import './polyfills';
 import { initCheckboxes } from './controls/checkbox';
 import { initClientTabs } from './controls/ctabs';
 import { initNewPostView } from './new-post-view';
+import { initPostLaterView } from './post-later-view';
 import { initSavedPostsPage, resolvePendingSavedPostUpload } from './saved-posts';
 import { pjaxBack, pjaxCanGoBack, pjaxInit, pjaxLoadUrl, pjaxRefresh } from './pjax';
 import { initPostPageView, initYeahButton } from './post';
@@ -87,6 +88,7 @@ function initAll() {
 	resolvePendingSavedPostUpload();
 	initPosts();
 	initNewPostView();
+	initPostLaterView();
 	initSavedPostsPage();
 	initNavTabs();
 	initPostPageView();
