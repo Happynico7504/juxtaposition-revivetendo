@@ -1,4 +1,5 @@
 import { ctabOnShown } from './controls/ctabs';
+import { LOAD_ON_COMPOSE_KEY, PENDING_UPLOAD_KEY, readSavedPost } from './saved-posts';
 
 export function initNewPostView(): void {
 	var page = document.querySelector('#add-post-page');
@@ -28,93 +29,20 @@ export function initNewPostView(): void {
 	ctabOnShown(ctab, 'painting', delayedMemo);
 
 	initScreenshotControl(page, ctab);
-	initSavedPosts(page, memo_image, memo_input);
+	initSavedPostPreload(page, memo_image, memo_input);
 }
 
-// The 3DS saves posts composed while offline into the shared cave.lls_* key/value
-// store, keyed by the unix timestamp they were saved at (JSON: feeling, spoiler,
-// text, titleID, screenShotKey, paint - this is the real format the system's own
-// "Offline Mode" composer applet writes). That applet only writes/lists/deletes -
-// it has no network access, so submitting a saved post once back online has to
-// happen from here, through the normal post form.
-type SavedPost = {
-	feeling: number;
-	spoiler: boolean;
-	text: string | null;
-	titleID?: string;
-	screenShotKey?: string;
-	paint?: string;
-};
-
-function isSavedPostKey(key: string): boolean {
-	return /^[0-9]+$/.test(key);
-}
-
-function readSavedPost(key: string): SavedPost | null {
-	var raw = cave.lls_getItem(key);
-	if (!raw) {
-		return null;
+// If the community page handed off a saved post (see saved-posts.ts), fill the form
+// with it as soon as this page loads.
+function initSavedPostPreload(page: Element, memo_image: HTMLImageElement, memo_input: HTMLInputElement): void {
+	var key = cave.lls_getItem(LOAD_ON_COMPOSE_KEY);
+	if (!key) {
+		return;
 	}
-	try {
-		return JSON.parse(raw) as SavedPost;
-	} catch {
-		return null;
-	}
-}
+	cave.lls_removeItem(LOAD_ON_COMPOSE_KEY);
 
-function getSavedPosts(): Array<{ key: string; post: SavedPost }> {
-	var out: Array<{ key: string; post: SavedPost }> = [];
-	var count = cave.lls_getCount();
-	for (var i = 0; i < count; i++) {
-		var key = cave.lls_getKeyAt(i);
-		if (!isSavedPostKey(key)) {
-			continue;
-		}
-		var post = readSavedPost(key);
-		if (post) {
-			out.push({ key: key, post: post });
-		}
-	}
-	// Newest first, matching the real offline composer's own ordering.
-	out.sort((a, b) => Number(b.key) - Number(a.key));
-	return out;
-}
-
-function removeSavedPost(key: string): void {
 	var post = readSavedPost(key);
-	if (post?.screenShotKey) {
-		cave.lls_removeItem(post.screenShotKey);
-	}
-	cave.lls_removeItem(key);
-}
-
-// Submitting the post form is a normal (non-AJAX) navigation, so there's no success
-// callback to hook here - on submit we just remember which saved post we're trying to
-// upload. If the server rejects it, it redisplays this same page with an error and we
-// leave the saved post alone so the user can retry. Any other page load (success
-// redirects elsewhere, or #add-post-page re-renders without an error) means it went
-// through, so this gets checked - and acted on - on every page init.
-var PENDING_UPLOAD_KEY = '__pendingSavedPostUpload';
-
-export function resolvePendingSavedPostUpload(): void {
-	var pendingKey = cave.lls_getItem(PENDING_UPLOAD_KEY);
-	if (!pendingKey) {
-		return;
-	}
-
-	var failedRetry = document.querySelector('#add-post-page .error-text');
-	if (failedRetry) {
-		return;
-	}
-
-	removeSavedPost(pendingKey);
-	cave.lls_removeItem(PENDING_UPLOAD_KEY);
-}
-
-function initSavedPosts(page: Element, memo_image: HTMLImageElement, memo_input: HTMLInputElement): void {
-	var toggle = document.querySelector('[data-saved-posts-toggle]');
-	var list = document.getElementById('saved-posts-list');
-	if (!toggle || !list) {
+	if (!post) {
 		return;
 	}
 
@@ -125,8 +53,6 @@ function initSavedPosts(page: Element, memo_image: HTMLImageElement, memo_input:
 	var shotUpload = page.querySelector('[data-shot-upload]') as HTMLInputElement | null;
 	var shotPreview = page.querySelector('[data-shot-preview]') as HTMLElement | null;
 
-	var loadedKey: string | null = null;
-
 	function setPostType(value: string): void {
 		postTypeInputs.forEach((input) => {
 			input.checked = input.value === value;
@@ -134,92 +60,32 @@ function initSavedPosts(page: Element, memo_image: HTMLImageElement, memo_input:
 		});
 	}
 
-	function loadSavedPost(key: string, post: SavedPost): void {
-		feelingInputs.forEach((input) => {
-			input.checked = input.value === String(post.feeling);
-		});
-
-		spoilerInput.checked = !!post.spoiler;
-		spoilerInput.dispatchEvent(new Event('change'));
-
-		if (post.text !== null && post.text !== undefined) {
-			bodyInput.value = post.text;
-			bodyInput.dispatchEvent(new Event('input'));
-			setPostType('body');
-		} else if (post.paint) {
-			memo_image.src = 'data:image/bmp;base64,' + post.paint;
-			memo_input.value = post.paint;
-			setPostType('painting');
-		}
-
-		if (post.screenShotKey && shotUpload) {
-			shotUpload.setAttribute('lls', post.screenShotKey);
-			if (shotPreview) {
-				shotPreview.style.backgroundImage = `url(${cave.lls_getPath(post.screenShotKey)})`;
-			}
-		}
-
-		loadedKey = key;
-		list!.classList.add('none');
-	}
-
-	function render(): void {
-		var posts = getSavedPosts();
-		list!.innerHTML = '';
-
-		if (posts.length === 0) {
-			var empty = document.createElement('p');
-			empty.className = 'saved-posts-empty';
-			empty.textContent = list!.getAttribute('data-empty-text');
-			list!.appendChild(empty);
-			return;
-		}
-
-		var paintingText = list!.getAttribute('data-painting-text');
-		posts.forEach((entry) => {
-			var item = document.createElement('div');
-			item.className = 'saved-post';
-
-			var preview = document.createElement('a');
-			preview.href = '#';
-			preview.className = 'saved-post-preview';
-			preview.textContent = entry.post.text !== null && entry.post.text !== undefined
-				? entry.post.text
-				: paintingText;
-			preview.addEventListener('click', (e) => {
-				e.preventDefault();
-				loadSavedPost(entry.key, entry.post);
-			});
-			item.appendChild(preview);
-
-			var del = document.createElement('button');
-			del.type = 'button';
-			del.className = 'saved-post-delete symbol';
-			del.textContent = '×';
-			del.addEventListener('click', () => {
-				removeSavedPost(entry.key);
-				render();
-			});
-			item.appendChild(del);
-
-			list!.appendChild(item);
-		});
-	}
-
-	toggle.addEventListener('click', (e) => {
-		e.preventDefault();
-		var opening = list!.classList.contains('none');
-		if (opening) {
-			render();
-		}
-		list!.classList.toggle('none');
+	feelingInputs.forEach((input) => {
+		input.checked = input.value === String(post!.feeling);
 	});
 
-	page.addEventListener('submit', () => {
-		if (loadedKey) {
-			cave.lls_setItem(PENDING_UPLOAD_KEY, loadedKey);
-			loadedKey = null;
+	spoilerInput.checked = !!post.spoiler;
+	spoilerInput.dispatchEvent(new Event('change'));
+
+	if (post.text !== null && post.text !== undefined) {
+		bodyInput.value = post.text;
+		bodyInput.dispatchEvent(new Event('input'));
+		setPostType('body');
+	} else if (post.paint) {
+		memo_image.src = 'data:image/bmp;base64,' + post.paint;
+		memo_input.value = post.paint;
+		setPostType('painting');
+	}
+
+	if (post.screenShotKey && shotUpload) {
+		shotUpload.setAttribute('lls', post.screenShotKey);
+		if (shotPreview) {
+			shotPreview.style.backgroundImage = `url(${cave.lls_getPath(post.screenShotKey)})`;
 		}
+	}
+
+	page.addEventListener('submit', () => {
+		cave.lls_setItem(PENDING_UPLOAD_KEY, key);
 	});
 }
 

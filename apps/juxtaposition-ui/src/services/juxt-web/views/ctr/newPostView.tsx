@@ -6,7 +6,6 @@ import { T } from '@/services/juxt-web/views/common/components/T';
 import { CtrPageBody, CtrRoot } from '@/services/juxt-web/views/ctr/root';
 import { useCache } from '@/services/juxt-web/views/common/hooks/useCache';
 import { CtrPageTitledHeader } from '@/services/juxt-web/views/ctr/components/CtrPageHeader';
-import { CtrPageButton, CtrPageButtons } from '@/services/juxt-web/views/ctr/components/CtrPageButtons';
 import type { ReactNode } from 'react';
 import type { NewPostViewProps } from '@/services/juxt-web/views/web/newPostView';
 
@@ -53,17 +52,6 @@ export function CtrNewPostView(props: NewPostViewProps): ReactNode {
 			>
 				<T k="new_post.post_to" values={{ user: name ?? '' }} />
 			</CtrPageTitledHeader>
-			<CtrPageButtons>
-				<CtrPageButton type="right" data-saved-posts-toggle="1">
-					<T k="new_post.saved_posts" />
-				</CtrPageButton>
-			</CtrPageButtons>
-			<div
-				id="saved-posts-list"
-				className="none"
-				data-empty-text={T.str('new_post.saved_posts_empty')}
-				data-painting-text={T.str('new_post.saved_posts_painting')}
-			></div>
 			<form method="post" action={props.url} id="posts-form" data-is-own-title="1" data-is-identified="1" encType="multipart/form-data">
 				<input type="hidden" name="community_id" value={props.id} />
 				<input type="hidden" name="bmp" value="true" />
