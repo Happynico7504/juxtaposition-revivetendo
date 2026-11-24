@@ -9,20 +9,22 @@ export type SavedPostsViewProps = {
 
 export function CtrSavedPostsView(props: SavedPostsViewProps): ReactNode {
 	return (
-		<div id="saved-posts-page">
+		<>
 			<CtrPageTitledHeader
 				data-toolbar-mode="normal"
 				data-toolbar-active-button="3"
 			>
 				<T k="new_post.saved_posts" />
 			</CtrPageTitledHeader>
-			<div
-				id="saved-posts-list"
-				data-create-url={`/titles/${props.communityId}/create`}
-				data-empty-text={T.str('new_post.saved_posts_empty')}
-				data-painting-text={T.str('new_post.saved_posts_painting')}
-			></div>
-		</div>
+			<div className="body-content">
+				<div
+					id="saved-posts-list"
+					data-create-url={`/titles/${props.communityId}/create`}
+					data-empty-text={T.str('new_post.saved_posts_empty')}
+					data-painting-text={T.str('new_post.saved_posts_painting')}
+				></div>
+			</div>
+		</>
 	);
 }
 
