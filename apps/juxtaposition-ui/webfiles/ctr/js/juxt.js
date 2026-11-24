@@ -138,6 +138,37 @@ function saveUserSettings() {
 	document.getElementById('submit').click();
 }
 window.saveUserSettings = saveUserSettings;
+
+// The real Miiverse resubmits a post composed while offline (the console saves up to 3
+// of these itself) through its own posting applet, "solv3" - a separate system title,
+// not a page we can serve. Each region ships its own copy; try all three known title
+// IDs (JPN/USA/EUR, confirmed USA = 0004001000008b02 via 3dbrew's title list) and jump
+// to whichever exists on this console. jump_setNumberDataToApp's first argument (12) and
+// jump_toApplication's (2) are the only values ever observed for this call pair in a
+// real capture - what they actually mean isn't documented, so this is best-effort.
+var SOLV3_TITLE_IDS = [
+	'0004001000008302', // JPN
+	'0004001000008b02', // USA
+	'000400100000ba02' // EUR
+];
+
+function openSavedPosts(el) {
+	var communityId = el.getAttribute('data-community-id');
+	var titleId = null;
+	for (var i = 0; i < SOLV3_TITLE_IDS.length; i++) {
+		if (cave.jump_existsApplication(SOLV3_TITLE_IDS[i])) {
+			titleId = SOLV3_TITLE_IDS[i];
+			break;
+		}
+	}
+	if (!titleId) {
+		cave.dialog_oneButton('Saved Posts', 'This feature isn\'t available on your system.', 'OK');
+		return;
+	}
+	cave.jump_setNumberDataToApp(12, parseInt(communityId, 10));
+	cave.jump_toApplication(2, titleId);
+}
+window.openSavedPosts = openSavedPosts;
 function exitUserSettings() {
 	pjaxLoadUrl('/users/me', true);
 	cave.toolbar_setButtonType(1);

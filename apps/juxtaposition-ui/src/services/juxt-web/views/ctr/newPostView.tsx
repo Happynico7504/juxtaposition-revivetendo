@@ -118,6 +118,18 @@ export function CtrNewPostView(props: NewPostViewProps): ReactNode {
 					className="post-button"
 				/>
 			</form>
+			{props.id
+				? (
+						<a
+							href="#"
+							className="saved-posts-button"
+							evt-click="openSavedPosts(this)"
+							data-community-id={props.id}
+						>
+							<T k="new_post.saved_posts" />
+						</a>
+					)
+				: null}
 		</div>
 	);
 }
