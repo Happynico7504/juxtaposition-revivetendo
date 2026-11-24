@@ -138,49 +138,6 @@ function saveUserSettings() {
 	document.getElementById('submit').click();
 }
 window.saveUserSettings = saveUserSettings;
-
-// The real Miiverse resubmits a post composed while offline (the console saves up to 3
-// of these itself) through its own posting applet, "solv3". Turns out jump_toApplication
-// isn't the right call for it at all: per libctru/3dbrew, solv3 is a *Library Applet*
-// (APT_StartLibraryApplet, AppID 0x118 - APPID_MIIVERSE_POSTING), launched by suspending
-// the caller and resuming it afterward, not by switching titles the way jump_toApplication
-// does (that's why it tried to read a game card - it treats its argument as a title to
-// switch to, not an applet to overlay). cave has no documented function for this pattern,
-// so as a next-cheapest guess: try passing the AppID itself, in different plausible string
-// encodings, through jump_toApplication's titleID argument instead of a real title ID.
-// Each tap of the button tries the next format in this list and remembers where it left
-// off (cave.ls_* - native sessionStorage bridge, used instead of the real sessionStorage
-// object since this old WebKit doesn't reliably support it) so a redeploy isn't needed
-// between attempts - tap, see what happens, report back, come back and tap again.
-var SOLV3_APPID_GUESSES = [
-	'118',
-	'0118',
-	'00000118',
-	'0x118',
-	'280',
-	'0000011800000000'
-];
-
-function openSavedPosts(el) {
-	var communityId = el.getAttribute('data-community-id');
-
-	var i = parseInt(cave.ls_getItem('savedPostsGuessIndex') || '0', 10);
-	if (!(i >= 0) || i >= SOLV3_APPID_GUESSES.length) {
-		i = 0;
-	}
-	var guess = SOLV3_APPID_GUESSES[i];
-	cave.ls_setItem('savedPostsGuessIndex', (i + 1).toString());
-
-	cave.dialog_oneButton(
-		'Saved Posts (debug)',
-		'Attempt ' + (i + 1) + '/' + SOLV3_APPID_GUESSES.length + ': "' + guess + '"',
-		'OK'
-	);
-
-	cave.jump_setNumberDataToApp(12, parseInt(communityId, 10));
-	cave.jump_toApplication(2, guess);
-}
-window.openSavedPosts = openSavedPosts;
 function exitUserSettings() {
 	pjaxLoadUrl('/users/me', true);
 	cave.toolbar_setButtonType(1);
