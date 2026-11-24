@@ -140,47 +140,45 @@ function saveUserSettings() {
 window.saveUserSettings = saveUserSettings;
 
 // The real Miiverse resubmits a post composed while offline (the console saves up to 3
-// of these itself) through its own posting applet, "solv3" - a separate system title,
-// not a page we can serve. Each region ships its own copy (low ID confirmed USA =
-// ...008b02 via 3dbrew's title list, high ID 00040030 since solv3/olv are both "System
-// Applets" there, not "System Applications" which use 00040010). Pick the copy matching
-// this console's own region instead of guessing/looping - there's only ever one real
-// answer for a given console. jump_setNumberDataToApp's first argument (12) and
-// jump_toApplication's (2) are the only values ever observed for this call pair in a
-// real capture - what they actually mean isn't documented, so this is best-effort.
-var SOLV3_TITLE_IDS = {
-	JPN: '0004003000008302',
-	USA: '0004003000008B02',
-	EUR: '000400300000BA02'
-};
-
-function solv3TitleId() {
-	var region;
-	try {
-		region = cave.cfg_getRegionCodeA3();
-	} catch (e) {
-		region = null;
-	}
-	// AUS/CHN/KOR/TWN consoles don't have their own solv3 build - they run on EUR's.
-	return SOLV3_TITLE_IDS[region] || SOLV3_TITLE_IDS.EUR;
-}
+// of these itself) through its own posting applet, "solv3". Turns out jump_toApplication
+// isn't the right call for it at all: per libctru/3dbrew, solv3 is a *Library Applet*
+// (APT_StartLibraryApplet, AppID 0x118 - APPID_MIIVERSE_POSTING), launched by suspending
+// the caller and resuming it afterward, not by switching titles the way jump_toApplication
+// does (that's why it tried to read a game card - it treats its argument as a title to
+// switch to, not an applet to overlay). cave has no documented function for this pattern,
+// so as a next-cheapest guess: try passing the AppID itself, in different plausible string
+// encodings, through jump_toApplication's titleID argument instead of a real title ID.
+// Each tap of the button tries the next format in this list and remembers where it left
+// off (cave.ls_* - native sessionStorage bridge, used instead of the real sessionStorage
+// object since this old WebKit doesn't reliably support it) so a redeploy isn't needed
+// between attempts - tap, see what happens, report back, come back and tap again.
+var SOLV3_APPID_GUESSES = [
+	'118',
+	'0118',
+	'00000118',
+	'0x118',
+	'280',
+	'0000011800000000'
+];
 
 function openSavedPosts(el) {
 	var communityId = el.getAttribute('data-community-id');
-	var titleId = solv3TitleId();
 
-	// DIAGNOSTIC: still unconfirmed whether solv3 is reachable at all on real hardware -
-	// show what jump_existsApplication says for the region-matched ID before jumping.
-	var exists;
-	try {
-		exists = cave.jump_existsApplication(titleId);
-	} catch (e) {
-		exists = 'threw: ' + e;
+	var i = parseInt(cave.ls_getItem('savedPostsGuessIndex') || '0', 10);
+	if (!(i >= 0) || i >= SOLV3_APPID_GUESSES.length) {
+		i = 0;
 	}
-	cave.dialog_oneButton('Saved Posts (debug)', titleId + ' exists = ' + exists, 'OK');
+	var guess = SOLV3_APPID_GUESSES[i];
+	cave.ls_setItem('savedPostsGuessIndex', (i + 1).toString());
+
+	cave.dialog_oneButton(
+		'Saved Posts (debug)',
+		'Attempt ' + (i + 1) + '/' + SOLV3_APPID_GUESSES.length + ': "' + guess + '"',
+		'OK'
+	);
 
 	cave.jump_setNumberDataToApp(12, parseInt(communityId, 10));
-	cave.jump_toApplication(2, titleId);
+	cave.jump_toApplication(2, guess);
 }
 window.openSavedPosts = openSavedPosts;
 function exitUserSettings() {
