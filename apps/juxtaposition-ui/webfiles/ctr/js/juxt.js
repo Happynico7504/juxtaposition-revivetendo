@@ -150,8 +150,8 @@ window.saveUserSettings = saveUserSettings;
 // real capture - what they actually mean isn't documented, so this is best-effort.
 var SOLV3_TITLE_IDS = {
 	JPN: '0004003000008302',
-	USA: '0004003000008b02',
-	EUR: '000400300000ba02'
+	USA: '0004003000008B02',
+	EUR: '000400300000BA02'
 };
 
 function solv3TitleId() {
