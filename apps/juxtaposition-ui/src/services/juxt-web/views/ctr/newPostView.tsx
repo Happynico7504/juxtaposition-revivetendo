@@ -52,15 +52,6 @@ export function CtrNewPostView(props: NewPostViewProps): ReactNode {
 			>
 				<T k="new_post.post_to" values={{ user: name ?? '' }} />
 			</CtrPageTitledHeader>
-			<a href="#" className="saved-posts-toggle">
-				<T k="new_post.saved_posts" />
-			</a>
-			<div
-				id="saved-posts-list"
-				className="none"
-				data-empty-text={T.str('new_post.saved_posts_empty')}
-				data-painting-text={T.str('new_post.saved_posts_painting')}
-			></div>
 			<form method="post" action={props.url} id="posts-form" data-is-own-title="1" data-is-identified="1" encType="multipart/form-data">
 				<input type="hidden" name="community_id" value={props.id} />
 				<input type="hidden" name="bmp" value="true" />
@@ -113,6 +104,15 @@ export function CtrNewPostView(props: NewPostViewProps): ReactNode {
 							<img id="memo-img-input" src="" />
 							<input type="hidden" name="painting" />
 						</CtrTabView>
+						<a href="#" className="saved-posts-toggle">
+							<T k="new_post.saved_posts" />
+						</a>
+						<div
+							id="saved-posts-list"
+							className="none"
+							data-empty-text={T.str('new_post.saved_posts_empty')}
+							data-painting-text={T.str('new_post.saved_posts_painting')}
+						></div>
 						<div className="spoiler-checkbox">
 							<label htmlFor="cb-spoiler"><T k="new_post.spoiler_label" /></label>
 							<CtrCheckbox id="cb-spoiler" name="spoiler" value="true" sprite="sp-spoiler" />
