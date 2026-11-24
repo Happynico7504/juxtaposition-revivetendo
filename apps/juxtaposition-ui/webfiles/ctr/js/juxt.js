@@ -141,47 +141,44 @@ window.saveUserSettings = saveUserSettings;
 
 // The real Miiverse resubmits a post composed while offline (the console saves up to 3
 // of these itself) through its own posting applet, "solv3" - a separate system title,
-// not a page we can serve. Each region ships its own copy; try all three known title
-// IDs (JPN/USA/EUR; low ID confirmed USA = ...008b02 via 3dbrew's title list, high ID
-// 00040030 since solv3/olv are both "System Applets" there, not "System Applications"
-// which use 00040010 - that wrong prefix is why the first version of this never found
-// solv3 on real hardware) and jump
-// to whichever exists on this console. jump_setNumberDataToApp's first argument (12) and
+// not a page we can serve. Each region ships its own copy (low ID confirmed USA =
+// ...008b02 via 3dbrew's title list, high ID 00040030 since solv3/olv are both "System
+// Applets" there, not "System Applications" which use 00040010). Pick the copy matching
+// this console's own region instead of guessing/looping - there's only ever one real
+// answer for a given console. jump_setNumberDataToApp's first argument (12) and
 // jump_toApplication's (2) are the only values ever observed for this call pair in a
 // real capture - what they actually mean isn't documented, so this is best-effort.
-var SOLV3_TITLE_IDS = [
-	'0004003000008302', // JPN
-	'0004003000008b02', // USA
-	'000400300000ba02' // EUR
-];
+var SOLV3_TITLE_IDS = {
+	JPN: '0004003000008302',
+	USA: '0004003000008b02',
+	EUR: '000400300000ba02'
+};
+
+function solv3TitleId() {
+	var region;
+	try {
+		region = cave.cfg_getRegionCodeA3();
+	} catch (e) {
+		region = null;
+	}
+	// AUS/CHN/KOR/TWN consoles don't have their own solv3 build - they run on EUR's.
+	return SOLV3_TITLE_IDS[region] || SOLV3_TITLE_IDS.EUR;
+}
 
 function openSavedPosts(el) {
 	var communityId = el.getAttribute('data-community-id');
+	var titleId = solv3TitleId();
 
-	// DIAGNOSTIC: show what jump_existsApplication actually says for each candidate,
-	// since it's reporting false for all three even with the corrected title IDs - either
-	// the existence check itself doesn't apply to this title category, or something about
-	// the ID string format is still off. Report what this dialog says back verbatim.
-	var report = [];
-	var titleId = null;
-	for (var i = 0; i < SOLV3_TITLE_IDS.length; i++) {
-		var id = SOLV3_TITLE_IDS[i];
-		var exists;
-		try {
-			exists = cave.jump_existsApplication(id);
-		} catch (e) {
-			exists = 'threw: ' + e;
-		}
-		report.push(id + ' = ' + exists);
-		if (exists === true && !titleId) {
-			titleId = id;
-		}
+	// DIAGNOSTIC: still unconfirmed whether solv3 is reachable at all on real hardware -
+	// show what jump_existsApplication says for the region-matched ID before jumping.
+	var exists;
+	try {
+		exists = cave.jump_existsApplication(titleId);
+	} catch (e) {
+		exists = 'threw: ' + e;
 	}
-	cave.dialog_oneButton('Saved Posts (debug)', report.join('\n'), 'OK');
+	cave.dialog_oneButton('Saved Posts (debug)', titleId + ' exists = ' + exists, 'OK');
 
-	// Try the jump anyway, using the USA ID, regardless of what jump_existsApplication said -
-	// the check itself might just be wrong/inapplicable for this title category.
-	titleId = titleId || SOLV3_TITLE_IDS[1];
 	cave.jump_setNumberDataToApp(12, parseInt(communityId, 10));
 	cave.jump_toApplication(2, titleId);
 }
