@@ -157,17 +157,31 @@ var SOLV3_TITLE_IDS = [
 
 function openSavedPosts(el) {
 	var communityId = el.getAttribute('data-community-id');
+
+	// DIAGNOSTIC: show what jump_existsApplication actually says for each candidate,
+	// since it's reporting false for all three even with the corrected title IDs - either
+	// the existence check itself doesn't apply to this title category, or something about
+	// the ID string format is still off. Report what this dialog says back verbatim.
+	var report = [];
 	var titleId = null;
 	for (var i = 0; i < SOLV3_TITLE_IDS.length; i++) {
-		if (cave.jump_existsApplication(SOLV3_TITLE_IDS[i])) {
-			titleId = SOLV3_TITLE_IDS[i];
-			break;
+		var id = SOLV3_TITLE_IDS[i];
+		var exists;
+		try {
+			exists = cave.jump_existsApplication(id);
+		} catch (e) {
+			exists = 'threw: ' + e;
+		}
+		report.push(id + ' = ' + exists);
+		if (exists === true && !titleId) {
+			titleId = id;
 		}
 	}
-	if (!titleId) {
-		cave.dialog_oneButton('Saved Posts', 'This feature isn\'t available on your system.', 'OK');
-		return;
-	}
+	cave.dialog_oneButton('Saved Posts (debug)', report.join('\n'), 'OK');
+
+	// Try the jump anyway, using the USA ID, regardless of what jump_existsApplication said -
+	// the check itself might just be wrong/inapplicable for this title category.
+	titleId = titleId || SOLV3_TITLE_IDS[1];
 	cave.jump_setNumberDataToApp(12, parseInt(communityId, 10));
 	cave.jump_toApplication(2, titleId);
 }
