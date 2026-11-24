@@ -63,33 +63,44 @@ export function CtrCommunityView(props: CommunityViewProps): ReactNode {
 								</CtrPageButton>
 							)
 						: null }
-					{props.hasSubCommunities
+					{props.canPost
 						? (
+								<CtrPageButton type="right" data-saved-posts-toggle="1">
+									<T k="new_post.saved_posts" />
+								</CtrPageButton>
+							)
+						: props.hasSubCommunities
+							? (
+									<CtrPageButton
+										type="right"
+										href={`/titles/${community.olive_community_id}/related`}
+									>
+										<T k="community.related_short" />
+									</CtrPageButton>
+								)
+							: null}
+				</CtrPageButtons>
+				{props.canPost
+					? (
+							<div
+								id="saved-posts-list"
+								className="none"
+								data-create-url={`/titles/${community.olive_community_id}/create`}
+								data-empty-text={T.str('new_post.saved_posts_empty')}
+								data-painting-text={T.str('new_post.saved_posts_painting')}
+							></div>
+						)
+					: null}
+				{props.canPost && props.hasSubCommunities
+					? (
+							<CtrPageButtons>
 								<CtrPageButton
 									type="right"
 									href={`/titles/${community.olive_community_id}/related`}
 								>
 									<T k="community.related_short" />
 								</CtrPageButton>
-							)
-						: null}
-				</CtrPageButtons>
-				{props.canPost
-					? (
-							<>
-								<CtrPageButtons>
-									<CtrPageButton type="right" data-saved-posts-toggle="1">
-										<T k="new_post.saved_posts" />
-									</CtrPageButton>
-								</CtrPageButtons>
-								<div
-									id="saved-posts-list"
-									className="none"
-									data-create-url={`/titles/${community.olive_community_id}/create`}
-									data-empty-text={T.str('new_post.saved_posts_empty')}
-									data-painting-text={T.str('new_post.saved_posts_painting')}
-								></div>
-							</>
+							</CtrPageButtons>
 						)
 					: null}
 				<div className="body-content tab2-content" id="community-post-list">
