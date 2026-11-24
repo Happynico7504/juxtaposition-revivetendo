@@ -6,6 +6,7 @@ import { T } from '@/services/juxt-web/views/common/components/T';
 import { CtrPageBody, CtrRoot } from '@/services/juxt-web/views/ctr/root';
 import { useCache } from '@/services/juxt-web/views/common/hooks/useCache';
 import { CtrPageTitledHeader } from '@/services/juxt-web/views/ctr/components/CtrPageHeader';
+import { CtrPageButton, CtrPageButtons } from '@/services/juxt-web/views/ctr/components/CtrPageButtons';
 import type { ReactNode } from 'react';
 import type { NewPostViewProps } from '@/services/juxt-web/views/web/newPostView';
 
@@ -52,6 +53,17 @@ export function CtrNewPostView(props: NewPostViewProps): ReactNode {
 			>
 				<T k="new_post.post_to" values={{ user: name ?? '' }} />
 			</CtrPageTitledHeader>
+			<CtrPageButtons>
+				<CtrPageButton type="right" data-saved-posts-toggle="1">
+					<T k="new_post.saved_posts" />
+				</CtrPageButton>
+			</CtrPageButtons>
+			<div
+				id="saved-posts-list"
+				className="none"
+				data-empty-text={T.str('new_post.saved_posts_empty')}
+				data-painting-text={T.str('new_post.saved_posts_painting')}
+			></div>
 			<form method="post" action={props.url} id="posts-form" data-is-own-title="1" data-is-identified="1" encType="multipart/form-data">
 				<input type="hidden" name="community_id" value={props.id} />
 				<input type="hidden" name="bmp" value="true" />
@@ -104,22 +116,13 @@ export function CtrNewPostView(props: NewPostViewProps): ReactNode {
 							<img id="memo-img-input" src="" />
 							<input type="hidden" name="painting" />
 						</CtrTabView>
-						<a href="#" className="saved-posts-toggle">
-							<T k="new_post.saved_posts" />
-						</a>
-						<div
-							id="saved-posts-list"
-							className="none"
-							data-empty-text={T.str('new_post.saved_posts_empty')}
-							data-painting-text={T.str('new_post.saved_posts_painting')}
-						></div>
 						<div className="spoiler-checkbox">
 							<label htmlFor="cb-spoiler"><T k="new_post.spoiler_label" /></label>
 							<CtrCheckbox id="cb-spoiler" name="spoiler" value="true" sprite="sp-spoiler" />
 						</div>
 					</CtrTabsView>
 				</div>
-				{props.errorText ? <p>{props.errorText}</p> : null}
+				{props.errorText ? <p className="error-text">{props.errorText}</p> : null}
 				<input id="message_to_pid" type="hidden" name="message_to_pid" value={props.messagePid ?? undefined} />
 				<input
 					type="submit"

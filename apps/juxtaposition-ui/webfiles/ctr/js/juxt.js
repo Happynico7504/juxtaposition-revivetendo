@@ -1,7 +1,7 @@
 import './polyfills';
 import { initCheckboxes } from './controls/checkbox';
 import { initClientTabs } from './controls/ctabs';
-import { initNewPostView } from './new-post-view';
+import { initNewPostView, resolvePendingSavedPostUpload } from './new-post-view';
 import { pjaxBack, pjaxCanGoBack, pjaxInit, pjaxLoadUrl, pjaxRefresh } from './pjax';
 import { initPostPageView, initYeahButton } from './post';
 import { initToolbarConfigs } from './toolbar';
@@ -83,6 +83,7 @@ function stopLoading() {
 window.stopLoading = stopLoading;
 
 function initAll() {
+	resolvePendingSavedPostUpload();
 	initPosts();
 	initNewPostView();
 	initNavTabs();

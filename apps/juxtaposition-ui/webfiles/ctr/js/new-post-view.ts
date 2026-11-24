@@ -88,8 +88,31 @@ function removeSavedPost(key: string): void {
 	cave.lls_removeItem(key);
 }
 
+// Submitting the post form is a normal (non-AJAX) navigation, so there's no success
+// callback to hook here - on submit we just remember which saved post we're trying to
+// upload. If the server rejects it, it redisplays this same page with an error and we
+// leave the saved post alone so the user can retry. Any other page load (success
+// redirects elsewhere, or #add-post-page re-renders without an error) means it went
+// through, so this gets checked - and acted on - on every page init.
+var PENDING_UPLOAD_KEY = '__pendingSavedPostUpload';
+
+export function resolvePendingSavedPostUpload(): void {
+	var pendingKey = cave.lls_getItem(PENDING_UPLOAD_KEY);
+	if (!pendingKey) {
+		return;
+	}
+
+	var failedRetry = document.querySelector('#add-post-page .error-text');
+	if (failedRetry) {
+		return;
+	}
+
+	removeSavedPost(pendingKey);
+	cave.lls_removeItem(PENDING_UPLOAD_KEY);
+}
+
 function initSavedPosts(page: Element, memo_image: HTMLImageElement, memo_input: HTMLInputElement): void {
-	var toggle = document.querySelector('.saved-posts-toggle');
+	var toggle = document.querySelector('[data-saved-posts-toggle]');
 	var list = document.getElementById('saved-posts-list');
 	if (!toggle || !list) {
 		return;
@@ -194,7 +217,7 @@ function initSavedPosts(page: Element, memo_image: HTMLImageElement, memo_input:
 
 	page.addEventListener('submit', () => {
 		if (loadedKey) {
-			removeSavedPost(loadedKey);
+			cave.lls_setItem(PENDING_UPLOAD_KEY, loadedKey);
 			loadedKey = null;
 		}
 	});
