@@ -65,7 +65,10 @@ export function CtrCommunityView(props: CommunityViewProps): ReactNode {
 						: null }
 					{props.canPost
 						? (
-								<CtrPageButton type="right" data-saved-posts-toggle="1">
+								<CtrPageButton
+									type="right"
+									href={`/titles/${community.olive_community_id}/saved_posts`}
+								>
 									<T k="new_post.saved_posts" />
 								</CtrPageButton>
 							)
@@ -80,17 +83,6 @@ export function CtrCommunityView(props: CommunityViewProps): ReactNode {
 								)
 							: null}
 				</CtrPageButtons>
-				{props.canPost
-					? (
-							<div
-								id="saved-posts-list"
-								className="none"
-								data-create-url={`/titles/${community.olive_community_id}/create`}
-								data-empty-text={T.str('new_post.saved_posts_empty')}
-								data-painting-text={T.str('new_post.saved_posts_painting')}
-							></div>
-						)
-					: null}
 				{props.canPost && props.hasSubCommunities
 					? (
 							<CtrPageButtons>

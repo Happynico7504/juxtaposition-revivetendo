@@ -18,6 +18,7 @@ import { CtrPostListView } from '@/services/juxt-web/views/ctr/postList';
 import { zodFallback } from '@/util';
 import { CtrNewPostPage } from '@/services/juxt-web/views/ctr/newPostView';
 import { PortalNewPostPage } from '@/services/juxt-web/views/portal/newPostView';
+import { CtrSavedPostsPage } from '@/services/juxt-web/views/ctr/savedPostsView';
 import { getShotMode, isPostingAllowed } from '@/services/juxt-web/routes/permissions';
 import { Community } from '@/models/communities';
 import { getAllFromList } from '@/api/helpers';
@@ -159,6 +160,23 @@ communitiesRouter.get('/:communityID/create', async function (req, res) {
 	res.jsxForDirectory({
 		ctr: <CtrNewPostPage {...props} />,
 		portal: <PortalNewPostPage {...props} />
+	});
+});
+
+communitiesRouter.get('/:communityID/saved_posts', async function (req, res) {
+	const { params } = parseReq(req, {
+		params: z.object({
+			communityID: z.string()
+		})
+	});
+
+	const { data: community } = await req.api.communities.get({ id: params.communityID });
+	if (!community) {
+		return res.sendStatus(404);
+	}
+
+	res.jsxForDirectory({
+		ctr: <CtrSavedPostsPage communityId={community.olive_community_id} />
 	});
 });
 

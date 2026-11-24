@@ -127,28 +127,11 @@ function render(list: HTMLElement, onSelect: (key: string, post: SavedPost) => v
 	});
 }
 
-// Wires up a [data-saved-posts-toggle] button + #saved-posts-list menu on whichever
-// page has them. onSelect decides what picking a saved post actually does there.
-export function initSavedPostsToggle(onSelect: (key: string, post: SavedPost) => void): void {
-	var toggle = document.querySelector('[data-saved-posts-toggle]');
-	var list = document.getElementById('saved-posts-list');
-	if (!toggle || !list) {
-		return;
-	}
-
-	toggle.addEventListener('click', (e) => {
-		e.preventDefault();
-		var opening = list.classList.contains('none');
-		if (opening) {
-			render(list, onSelect);
-		}
-		list.classList.toggle('none');
-	});
-}
-
-// On the community page: selecting a saved post hands it off to the compose page
-// instead of loading it directly here.
-export function initCommunitySavedPosts(): void {
+// Its own page (reached from the community header) rather than an overlay menu -
+// the old WebKit on 3DS doesn't handle a fixed full-screen overlay reliably.
+// Selecting a saved post here hands it off to that community's compose page instead
+// of loading it directly in place.
+export function initSavedPostsPage(): void {
 	var list = document.getElementById('saved-posts-list');
 	if (!list) {
 		return;
@@ -158,7 +141,7 @@ export function initCommunitySavedPosts(): void {
 		return;
 	}
 
-	initSavedPostsToggle((key) => {
+	render(list, (key) => {
 		cave.lls_setItem(LOAD_ON_COMPOSE_KEY, key);
 		pjaxLoadUrl(createUrl, true);
 	});

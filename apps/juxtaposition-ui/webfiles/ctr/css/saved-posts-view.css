@@ -1,0 +1,36 @@
+#saved-posts-list {
+    background: #3b1b3b;
+
+    .saved-posts-empty {
+        margin: 0;
+        padding: 10px;
+        color: #f4e7f4;
+    }
+
+    .saved-post {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 10px;
+        border-bottom: 1px solid #5c2a5c;
+    }
+
+    .saved-post-preview {
+        flex: 1;
+        color: #f4e7f4;
+        text-decoration: none;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin-right: 8px;
+    }
+
+    .saved-post-delete {
+        -webkit-appearance: none;
+        appearance: none;
+        border: 1px solid #930193;
+        background: #5c2a5c;
+        color: #f4e7f4;
+        padding: 2px 8px;
+    }
+}
